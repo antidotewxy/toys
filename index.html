@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#150c09">
+<title>玩具架 · toys</title>
+<style>
+  :root { --gold:#d8b25e; --cream:#f6ead2; --font:"Kaiti SC","KaiTi","STKaiti","楷体","Songti SC","Noto Serif SC",serif; }
+  * { box-sizing:border-box; }
+  html,body { height:100%; margin:0; }
+  body {
+    font-family:var(--font); color:var(--cream);
+    background:radial-gradient(120% 70% at 50% -10%, #3a2118 0%, #241509 45%, #150c09 100%), #150c09;
+    display:flex; align-items:center; justify-content:center;
+    padding:calc(22px + env(safe-area-inset-top)) 22px calc(22px + env(safe-area-inset-bottom));
+    -webkit-font-smoothing:antialiased;
+  }
+  .shelf { width:100%; max-width:520px; }
+  .head { display:flex; align-items:baseline; gap:12px; margin-bottom:18px; }
+  .title { font-size:22px; font-weight:700; letter-spacing:6px; text-indent:6px; }
+  .sub { font-size:11px; letter-spacing:2px; color:rgba(246,234,210,.4); }
+  .card {
+    display:flex; align-items:center; gap:14px; text-decoration:none; color:inherit;
+    padding:16px 18px; border-radius:16px; margin-bottom:12px;
+    background:linear-gradient(180deg, rgba(255,240,210,.06), rgba(255,240,210,.02));
+    border:1px solid rgba(216,178,94,.26);
+    transition:transform .12s ease, border-color .15s ease, background .15s ease;
+  }
+  .card:hover { transform:translateY(-1px); border-color:rgba(216,178,94,.5); background:linear-gradient(180deg, rgba(255,240,210,.1), rgba(255,240,210,.04)); }
+  .seal {
+    width:46px; height:46px; flex:0 0 auto; border-radius:50%; display:grid; place-items:center;
+    background:radial-gradient(circle at 34% 28%, #f2db9f, #c08a35 60%, #7c5416);
+    box-shadow:0 0 0 1px rgba(255,236,190,.28) inset, 0 8px 18px -12px rgba(216,178,94,.95);
+  }
+  .name { font-size:16px; letter-spacing:3px; }
+  .desc { margin-top:4px; font-size:11.5px; letter-spacing:1px; color:rgba(246,234,210,.45); }
+  .go { margin-left:auto; color:rgba(216,178,94,.7); font-size:13px; letter-spacing:1px; }
+  .empty {
+    padding:26px 18px; border-radius:16px; text-align:center;
+    border:1px dashed rgba(216,178,94,.2); color:rgba(246,234,210,.3);
+    font-size:12px; letter-spacing:1.5px;
+  }
+  .foot { margin-top:18px; text-align:center; font-size:10.5px; letter-spacing:1.6px; color:rgba(246,234,210,.26); }
+</style>
+</head>
+<body>
+<main class="shelf">
+  <div class="head">
+    <div class="title">玩具架</div>
+    <div class="sub">TOYS · 随手做的小东西</div>
+  </div>
+
+  <a class="card" href="./jiaobei/">
+    <div class="seal">
+      <svg viewBox="0 0 116 64" width="26" height="14" aria-hidden="true">
+        <path d="M8 52 C20 12 96 12 108 52 C88 32 24 32 8 52 Z" fill="#3a240f" stroke="rgba(58,36,15,.4)" stroke-width="1" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="name">掷筊 · 请示</div>
+      <div class="desc">两块杯，问一件事 · 圣杯 / 笑杯 / 阴杯</div>
+    </div>
+    <div class="go">进去 →</div>
+  </a>
+
+  <div class="empty">架子还空着，以后的新玩具都放这儿</div>
+  <div class="foot">心诚则灵 · 玩物不丧志</div>
+</main>
+</body>
+</html>
