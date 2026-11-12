@@ -1,0 +1,445 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f0e4cd">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>求签 · 心诚则灵</title>
+<style>
+  :root {
+    --ink: #2a1a12;
+    --ink-2: #5b4234;
+    --red: #b23a2a;
+    --red-2: #8d2a1d;
+    --paper: #f6ecd8;
+    --gold: #b08a45;
+    --font: "Kaiti SC", "KaiTi", "STKaiti", "楷体", "Songti SC", "Noto Serif SC", serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: var(--font); color: var(--ink); overflow: hidden;
+    background:
+      radial-gradient(120% 80% at 50% 0%, #fdf6e6 0%, #f0e4cd 55%, #e2d2b4 100%);
+    -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; opacity: .5;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(120,90,50,.05) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgba(120,90,50,.04) 0 1px, transparent 1px 4px);
+  }
+  body::after {
+    content: ''; position: fixed; inset: 12px; pointer-events: none;
+    border: 1px solid rgba(178,58,42,.18); border-radius: 3px;
+  }
+
+  .app {
+    position: relative; z-index: 2; height: 100%;
+    display: flex; flex-direction: column; align-items: center;
+    padding: calc(34px + env(safe-area-inset-top)) 22px calc(22px + env(safe-area-inset-bottom));
+  }
+  .head { text-align: center; }
+  .title { font-size: 22px; letter-spacing: 9px; text-indent: 9px; font-weight: 700; color: var(--red-2); }
+  .sub { margin-top: 8px; font-size: 11.5px; letter-spacing: 2.4px; color: rgba(90,66,52,.62); }
+
+  .stage { flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; min-height: 0; }
+
+  /* ---------- 签筒 ---------- */
+  .tube-wrap { position: relative; width: 168px; height: 232px; cursor: pointer; }
+  .tube {
+    position: absolute; left: 50%; bottom: 14px; width: 120px; height: 176px;
+    transform: translateX(-50%);
+    transform-origin: 50% 92%;
+  }
+  .tube.shake { animation: shake .52s cubic-bezier(.36,.07,.19,.97) 2; }
+  @keyframes shake {
+    0%,100% { transform: translateX(-50%) rotate(0deg); }
+    15% { transform: translateX(-50%) rotate(-8deg); }
+    30% { transform: translateX(-50%) rotate(7deg); }
+    45% { transform: translateX(-50%) rotate(-6deg); }
+    60% { transform: translateX(-50%) rotate(5deg); }
+    80% { transform: translateX(-50%) rotate(-2.5deg); }
+  }
+  .sticks { position: absolute; left: 50%; bottom: 118px; transform: translateX(-50%); width: 86px; height: 108px; }
+  .stick {
+    position: absolute; bottom: 0; width: 10px; border-radius: 5px 5px 1px 1px;
+    background: linear-gradient(180deg, #f2e3bd 0%, #e6d3a6 72%, #cbb383 100%);
+    box-shadow: inset -1px 0 0 rgba(120,90,50,.28), 0 0 0 .5px rgba(120,90,50,.18);
+    transition: transform .45s cubic-bezier(.2,.8,.2,1);
+  }
+  .stick::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 5px; height: 8px;
+    background: linear-gradient(180deg, #c0392b, #922b21); border-radius: 2px;
+  }
+  .stick.lucky { transform: translateY(-62px) rotate(-2deg); }
+  .stick.jitter { animation: jitter .18s linear infinite; }
+  @keyframes jitter { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-3px) } }
+
+  .tube-body {
+    position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+    width: 120px; height: 152px; border-radius: 10px 10px 14px 14px;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,.30) 0%, rgba(0,0,0,0) 16%, rgba(255,190,140,.10) 46%, rgba(0,0,0,0) 76%, rgba(0,0,0,.34) 100%),
+      linear-gradient(180deg, #8c3a26 0%, #6f2a1a 42%, #4a1a10 100%);
+    box-shadow: inset 0 3px 0 rgba(255,214,160,.22), inset 0 -10px 24px rgba(0,0,0,.35), 0 18px 34px -18px rgba(60,25,12,.8);
+    display: grid; place-items: center;
+  }
+  .rim {
+    position: absolute; left: 50%; bottom: 146px; transform: translateX(-50%);
+    width: 120px; height: 16px; border-radius: 50%;
+    background: linear-gradient(180deg, #3a120a, #6a2718 62%, #8c3a26);
+    box-shadow: inset 0 2px 3px rgba(0,0,0,.5), 0 1px 0 rgba(255,200,150,.15);
+  }
+  .tube-body::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 12px; height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(224,178,104,.75), transparent);
+  }
+  .tube-body::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 16px; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(224,178,104,.45), transparent);
+  }
+  .tube-char {
+    font-size: 44px; color: #f0d8a6; letter-spacing: 0; text-shadow: 0 2px 0 rgba(0,0,0,.35);
+    opacity: .92;
+  }
+  .tube-glow {
+    position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%);
+    width: 180px; height: 30px; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(80,40,20,.35), transparent 72%);
+  }
+
+  /* ---------- controls ---------- */
+  .hint { font-size: 11.5px; letter-spacing: 1.8px; color: rgba(90,66,52,.55); }
+  .panel { width: 100%; max-width: 420px; }
+  .ask {
+    width: 100%; height: 44px; padding: 0 13px; border-radius: 10px;
+    border: 1px solid rgba(140,100,60,.32); background: rgba(255,252,244,.7);
+    color: var(--ink); font-family: inherit; font-size: 13.5px; outline: none;
+  }
+  .ask::placeholder { color: rgba(90,66,52,.4); }
+  .ask:focus { border-color: rgba(178,58,42,.5); background: #fffdf7; }
+  .draw {
+    margin-top: 10px; width: 100%; height: 48px; border-radius: 10px; cursor: pointer;
+    border: 1px solid #7e2417; color: #fff4e2;
+    background: linear-gradient(180deg, #c2452f 0%, #a83324 55%, #8d2517 100%);
+    font-family: inherit; font-size: 16px; font-weight: 700; letter-spacing: 9px; text-indent: 9px;
+    box-shadow: 0 12px 26px -16px rgba(141,37,23,.9), inset 0 1px 0 rgba(255,230,200,.35);
+    transition: filter .15s ease, transform .12s ease;
+  }
+  .draw:hover { filter: brightness(1.06); }
+  .draw:active { transform: translateY(1px); }
+  .draw[disabled] { cursor: default; filter: saturate(.5) brightness(.9); }
+  .foot { margin-top: 14px; font-size: 10.5px; letter-spacing: 1.8px; color: rgba(90,66,52,.42); text-align: center; }
+  .foot b { color: var(--red-2); }
+
+  /* ---------- 签纸 ---------- */
+  .veil {
+    position: fixed; inset: 0; z-index: 50; display: none;
+    align-items: center; justify-content: center; padding: 18px;
+    background: rgba(38,20,12,.55);
+    -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  }
+  .veil.on { display: flex; animation: veilIn .28s ease both; }
+  @keyframes veilIn { from { opacity: 0 } to { opacity: 1 } }
+
+  .slip {
+    position: relative; width: min(94vw, 396px); max-height: 92vh; overflow: auto;
+    padding: 26px 22px 24px; border-radius: 4px;
+    background: linear-gradient(180deg, #fffaef 0%, #f8efdb 62%, #f1e3c8 100%);
+    border: 1px solid #d8c19a;
+    box-shadow: 0 30px 70px -30px rgba(30,10,4,.75), inset 0 0 0 6px rgba(255,255,255,.5);
+    animation: slipIn .5s cubic-bezier(.2,.9,.3,1) both;
+  }
+  @keyframes slipIn {
+    from { opacity: 0; transform: translateY(18px) scale(.94) rotate(-1.2deg); }
+    to   { opacity: 1; transform: none; }
+  }
+  .slip::before {
+    content: ''; position: absolute; inset: 10px; border: 1px solid rgba(178,58,42,.28);
+    border-radius: 2px; pointer-events: none;
+  }
+  .slip-head { display: flex; align-items: center; justify-content: space-between; }
+  .no { font-size: 13px; letter-spacing: 3px; color: var(--ink-2); }
+  .level {
+    display: inline-grid; place-items: center; width: 46px; height: 46px; border-radius: 50%;
+    border: 2px solid var(--red); color: var(--red); font-size: 15px; letter-spacing: 0;
+    transform: rotate(-6deg); opacity: .9;
+  }
+  .name { margin-top: 6px; text-align: center; font-size: 20px; letter-spacing: 8px; text-indent: 8px; color: var(--red-2); }
+  .poem {
+    writing-mode: vertical-rl; text-orientation: upright;
+    margin: 18px auto 6px; height: 212px; width: fit-content;
+    font-size: 18.5px; letter-spacing: 6px; line-height: 1.85; color: #241610;
+  }
+  .poem p { margin: 0; }
+  .ask-line { margin-top: 10px; text-align: center; font-size: 11.5px; letter-spacing: 1px; color: rgba(90,66,52,.55); }
+  .read { margin-top: 14px; padding-top: 14px; border-top: 1px dashed rgba(140,100,60,.4); font-size: 13px; line-height: 1.9; color: #3a271d; }
+  .read b { color: var(--red-2); font-weight: 700; }
+  .yi { margin-top: 8px; font-size: 12.5px; letter-spacing: 1.4px; color: var(--ink-2); }
+  .acts { margin-top: 18px; display: flex; gap: 10px; }
+  .acts button {
+    flex: 1; height: 42px; border-radius: 8px; cursor: pointer; font-family: inherit;
+    font-size: 14px; letter-spacing: 3px; transition: filter .15s ease;
+  }
+  .again { border: 1px solid #7e2417; background: linear-gradient(180deg, #c2452f, #8d2517); color: #fff4e2; }
+  .again:hover { filter: brightness(1.07); }
+  .close { flex: 0 0 96px; border: 1px solid rgba(140,100,60,.45); background: transparent; color: var(--ink-2); }
+  .close:hover { background: rgba(140,100,60,.08); }
+
+  @media (max-height: 720px) {
+    .tube-wrap { width: 140px; height: 200px; }
+    .tube { width: 106px; height: 156px; }
+    .tube-body { width: 106px; height: 134px; }
+    .rim { width: 106px; bottom: 128px; height: 14px; }
+    .sticks { bottom: 104px; width: 76px; height: 92px; }
+    .tube-char { font-size: 36px; }
+    .poem { font-size: 17px; height: 214px; letter-spacing: 5px; }
+    .slip { padding: 20px 18px 18px; }
+  }
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="head">
+    <div class="title">求 签</div>
+    <div class="sub">心中默念所求 · 摇动签筒</div>
+  </header>
+
+  <div class="stage">
+    <div class="tube-wrap" id="tubeWrap" title="摇一摇">
+      <div class="tube" id="tube">
+        <div class="sticks">
+          <div class="stick" style="left: 4px; height: 84px"></div>
+          <div class="stick" style="left: 18px; height: 96px"></div>
+          <div class="stick" style="left: 32px; height: 78px"></div>
+          <div class="stick" id="lucky" style="left: 46px; height: 104px"></div>
+          <div class="stick" style="left: 60px; height: 88px"></div>
+          <div class="stick" style="left: 74px; height: 98px"></div>
+        </div>
+        <div class="tube-body"><span class="tube-char">签</span></div>
+        <div class="rim"></div>
+      </div>
+      <div class="tube-glow"></div>
+    </div>
+    <div class="hint" id="hint">轻点签筒 或 点下面的按钮</div>
+  </div>
+
+  <div class="panel">
+    <input class="ask" id="ask" maxlength="30" placeholder="心中所问（可不填）…" spellcheck="false">
+    <button class="draw" id="draw">摇 签</button>
+  </div>
+
+  <footer class="foot">已求 <b id="count">0</b> 签 · 心诚则灵，姑妄听之</footer>
+</main>
+
+<div class="veil" id="veil">
+  <div class="slip" id="slip">
+    <div class="slip-head">
+      <span class="no" id="slipNo">第 一 签</span>
+      <span class="level" id="slipLevel">上吉</span>
+    </div>
+    <div class="name" id="slipName">云开见月</div>
+    <div class="poem" id="slipPoem"></div>
+    <div class="ask-line" id="slipAsk"></div>
+    <div class="read" id="slipRead"></div>
+    <div class="yi" id="slipYi"></div>
+    <div class="acts">
+      <button class="again" id="again">再求一签</button>
+      <button class="close" id="close">收起</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict'
+
+  var SIGNS = [
+    { name: '云开见月', level: '上上',
+      poem: ['云散长空月正明', '清光万里照人行', '此时莫问前程路', '自有天风送一程'],
+      read: '雾散月明，所待之事将有着落。不必催，也不必问，向前走就好。', yi: '宜：出行 · 谋事' },
+    { name: '春水初生', level: '上上',
+      poem: ['一溪春水绕青山', '流过桃花第几湾', '莫问前村何处是', '扁舟自会到江南'],
+      read: '路是慢慢走出来的，眼下正顺。顺着水走，自会到岸。', yi: '宜：启程 · 结缘' },
+    { name: '灯下有人', level: '上上',
+      poem: ['寒夜孤灯守一窗', '忽闻叩户是故人', '十年不见音书断', '相见犹能唤小名'],
+      read: '久无消息的人或事，会重新连上。别急着关门。', yi: '宜：叙旧 · 通话' },
+    { name: '老树新枝', level: '上吉',
+      poem: ['老树经霜未肯休', '春来又发两三头', '人间万事皆如此', '熬过寒冬自有收'],
+      read: '熬过这一段，收成自然来。慢一点不算输。', yi: '宜：坚持 · 静养' },
+    { name: '水到渠成', level: '上吉',
+      poem: ['田头引水不须忙', '自有沟渠到稻场', '若问今年收几许', '秋风起处满仓黄'],
+      read: '时机自来，不必催它。该做的做完了，就等风。', yi: '宜：等待 · 备耕' },
+    { name: '一叶知春', level: '上吉',
+      poem: ['庭前一叶落还生', '便觉春风到眼明', '莫道今年花事晚', '花开时节自倾城'],
+      read: '小变化里已经有好消息了，只是还没长成。', yi: '宜：留意 · 起身' },
+    { name: '客从远方', level: '上吉',
+      poem: ['远客来时雪正深', '炉边一坐话平生', '明朝各自东西去', '也胜人间不相逢'],
+      read: '会有一场意外的相遇，或者一只递过来的手。', yi: '宜：赴约 · 开口' },
+    { name: '山高月小', level: '上吉',
+      poem: ['山高月小水茫茫', '一棹归来夜未央', '莫问前头多少路', '且看两岸好风光'],
+      read: '路是远的，但沿途不亏。别只盯着终点。', yi: '宜：远行 · 慢走' },
+    { name: '守得云开', level: '中吉',
+      poem: ['云深不见来时路', '且向松根坐一回', '待到风来云自散', '青山原在眼前开'],
+      read: '眼下有些不明朗，那就坐一会儿。答案自己在路上。', yi: '宜：静候 · 少动' },
+    { name: '半亩方塘', level: '中吉',
+      poem: ['半亩方塘一鉴开', '天光云影共徘徊', '问渠那得清如许', '为有源头活水来'],
+      read: '把源头理顺，水自然清。旧事理一理，心里就亮了。', yi: '宜：读书 · 理旧事' },
+    { name: '慢慢来', level: '中吉',
+      poem: ['急雨打花花未落', '斜风吹柳柳还斜', '世间多少匆匆事', '都在人间一盏茶'],
+      read: '急不得。慢慢来，反而稳。', yi: '宜：缓行 · 喝盏茶' },
+    { name: '月有圆缺', level: '中平',
+      poem: ['月缺还圆自有期', '花开叶落各当时', '莫将心事量长短', '且待人间好日迟'],
+      read: '眼下平常，不必强求。日子还长，好日会来。', yi: '宜：安守 · 养身' },
+  ]
+
+  var CN = ['零','一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五']
+
+  var $ = function (id) { return document.getElementById(id) }
+  var tube = $('tube')
+  var tubeWrap = $('tubeWrap')
+  var lucky = $('lucky')
+  var drawBtn = $('draw')
+  var ask = $('ask')
+  var veil = $('veil')
+  var countEl = $('count')
+
+  var busy = false
+  var count = 0
+  var lastIndex = -1
+  var audio = null
+  var timers = []
+
+  /* ---------- storage（只存次数，不存问题） ---------- */
+  function load() {
+    try {
+      var raw = localStorage.getItem('toys.qian.v1')
+      if (!raw) return
+      var d = JSON.parse(raw)
+      if (d && typeof d.count === 'number') count = d.count
+      if (d && typeof d.last === 'number') lastIndex = d.last
+    } catch (e) {}
+  }
+  function save() {
+    try { localStorage.setItem('toys.qian.v1', JSON.stringify({ count: count, last: lastIndex })) } catch (e) {}
+  }
+
+  /* ---------- sound ---------- */
+  function prime() {
+    try {
+      var C = window.AudioContext || window.webkitAudioContext
+      if (!C) return
+      if (!audio) audio = new C()
+      if (audio.state === 'suspended') audio.resume()
+    } catch (e) {}
+  }
+  function knock(at, vol) {
+    try {
+      if (!audio) return
+      var now = audio.currentTime + at
+      var len = Math.max(1, Math.floor(audio.sampleRate * 0.05))
+      var buf = audio.createBuffer(1, len, audio.sampleRate)
+      var d = buf.getChannelData(0)
+      for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 9)
+      var src = audio.createBufferSource(); src.buffer = buf
+      var bp = audio.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2400; bp.Q.value = 1.6
+      var g = audio.createGain(); g.gain.value = vol
+      src.connect(bp); bp.connect(g); g.connect(audio.destination)
+      src.start(now)
+    } catch (e) {}
+  }
+  function chime() {
+    try {
+      if (!audio) return
+      var now = audio.currentTime
+      ;[1, 2.0, 3.01].forEach(function (m, i) {
+        var o = audio.createOscillator(); o.type = 'sine'; o.frequency.value = 660 * m
+        var g = audio.createGain()
+        var v = 0.035 / (i + 1.4)
+        g.gain.setValueAtTime(0.0001, now)
+        g.gain.exponentialRampToValueAtTime(v, now + 0.02)
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 2.2)
+        o.connect(g); g.connect(audio.destination)
+        o.start(now); o.stop(now + 2.4)
+      })
+    } catch (e) {}
+  }
+  function rattle() {
+    for (var i = 0; i < 9; i++) knock(i * 0.075, 0.05 + Math.random() * 0.04)
+  }
+
+  /* ---------- draw ---------- */
+  function pick() {
+    var i = Math.floor(Math.random() * SIGNS.length)
+    if (i === lastIndex) i = (i + 1 + Math.floor(Math.random() * (SIGNS.length - 1))) % SIGNS.length
+    return i
+  }
+
+  function openSlip(index) {
+    var s = SIGNS[index]
+    $('slipNo').textContent = '第 ' + (CN[index + 1] || (index + 1)) + ' 签'
+    $('slipLevel').textContent = s.level
+    $('slipName').textContent = s.name
+    $('slipPoem').innerHTML = s.poem.map(function (line) { return '<p>' + line + '</p>' }).join('')
+    $('slipRead').innerHTML = '<b>解</b>　' + s.read
+    $('slipYi').textContent = s.yi
+    var q = (ask.value || '').trim().slice(0, 30)
+    $('slipAsk').textContent = q ? '所问：' + q : ''
+    veil.classList.add('on')
+    chime()
+  }
+
+  function draw() {
+    if (busy) return
+    busy = true
+    prime()
+    drawBtn.disabled = true
+    tube.classList.remove('shake')
+    lucky.classList.remove('lucky')
+    void tube.offsetWidth
+    tube.classList.add('shake')
+    rattle()
+
+    var index = pick()
+
+    timers.push(setTimeout(function () {
+      lucky.classList.add('lucky')
+      knock(0.05, 0.12)
+    }, 620))
+
+    timers.push(setTimeout(function () {
+      openSlip(index)
+      tube.classList.remove('shake')
+      lastIndex = index
+      count += 1
+      countEl.textContent = count
+      save()
+      busy = false
+      drawBtn.disabled = false
+    }, 1150))
+  }
+
+  function reset() {
+    veil.classList.remove('on')
+    lucky.classList.remove('lucky')
+  }
+
+  /* ---------- wiring ---------- */
+  drawBtn.addEventListener('click', draw)
+  tubeWrap.addEventListener('click', draw)
+  $('again').addEventListener('click', function () { reset(); setTimeout(draw, 180) })
+  $('close').addEventListener('click', reset)
+  veil.addEventListener('click', function (e) { if (e.target === veil) reset() })
+  ask.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); draw() } })
+
+  load()
+  countEl.textContent = count
+})()
+</script>
+</body>
+</html>
+
+
