@@ -1,0 +1,426 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1b1230">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>祈福灯 · 愿有一盏为你而亮</title>
+<style>
+  :root {
+    --gold: #e8c98a;
+    --warm: #ffcf8a;
+    --cream: #f8efe0;
+    --font: "Kaiti SC", "KaiTi", "STKaiti", "楷体", "Songti SC", "Noto Serif SC", serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: var(--font); color: var(--cream); overflow: hidden;
+    background: #120c1e;
+    -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ---------- sky ---------- */
+  .sky {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(90% 55% at 50% 108%, rgba(255,164,92,.30) 0%, rgba(255,140,80,.10) 38%, transparent 68%),
+      radial-gradient(70% 50% at 78% 6%, rgba(120,140,220,.16) 0%, transparent 60%),
+      linear-gradient(180deg, #0b0a1c 0%, #1b1230 34%, #2c1730 62%, #4a2130 84%, #6b2f2c 100%);
+  }
+  .stars { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+  .star {
+    position: absolute; border-radius: 50%; background: #fff;
+    animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle { 0%,100% { opacity: .18; } 50% { opacity: .85; } }
+
+  .moon {
+    position: fixed; top: 5.5%; right: 7%; width: 78px; height: 78px; z-index: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 36% 32%, #fff8e6, #f4e3bd 55%, #d9c294 100%);
+    box-shadow: 0 0 60px 18px rgba(255,235,190,.16), 0 0 140px 60px rgba(255,220,160,.07);
+    animation: moonGlow 9s ease-in-out infinite;
+  }
+  @keyframes moonGlow { 0%,100% { opacity: .92; } 50% { opacity: 1; } }
+
+  /* ---------- layout ---------- */
+  .app {
+    position: relative; z-index: 2;
+    height: 100%; display: flex; flex-direction: column; align-items: center;
+    padding: calc(30px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));
+  }
+  .head { text-align: center; }
+  .title { font-size: 21px; letter-spacing: 7px; text-indent: 7px; font-weight: 700; color: #fdf3df; }
+  .sub { margin-top: 8px; font-size: 11px; letter-spacing: 2.6px; color: rgba(248,239,224,.46); }
+
+  .center {
+    flex: 1; width: 100%; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 20px; min-height: 0;
+  }
+
+  /* ---------- lantern ---------- */
+  .lantern-wrap { position: relative; width: 132px; height: 188px; cursor: pointer; }
+  .lantern-wrap:hover .lantern { filter: brightness(1.06); }
+  .lantern {
+    position: absolute; inset: 0;
+    animation: float 5.2s ease-in-out infinite;
+    transform-origin: 50% 100%;
+    transition: filter .2s ease, opacity .28s ease;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0) rotate(-1.2deg); }
+    50%     { transform: translateY(-9px) rotate(1.2deg); }
+  }
+  .lantern svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .flame { transform-origin: 50% 90%; animation: flick 1.7s ease-in-out infinite; }
+  @keyframes flick {
+    0%,100% { transform: scaleY(1) scaleX(1); opacity: .95; }
+    30%     { transform: scaleY(1.12) scaleX(.94); opacity: 1; }
+    65%     { transform: scaleY(.93) scaleX(1.05); opacity: .9; }
+  }
+  .hint {
+    font-size: 11.5px; letter-spacing: 1.6px; color: rgba(248,239,224,.42);
+    transition: opacity .3s ease;
+  }
+
+  /* ---------- panel ---------- */
+  .panel {
+    width: 100%; max-width: 460px;
+    padding: 14px; border-radius: 18px;
+    background: rgba(20,14,30,.5);
+    border: 1px solid rgba(232,201,138,.18);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 20px 50px -30px #000;
+  }
+  .wish {
+    width: 100%; border: none; outline: none; resize: none;
+    background: rgba(255,246,230,.06); border-radius: 12px;
+    padding: 11px 13px; height: 46px;
+    color: var(--cream); font-family: inherit; font-size: 14px; line-height: 1.6;
+    border: 1px solid rgba(232,201,138,.14);
+  }
+  .wish::placeholder { color: rgba(248,239,224,.3); }
+  .wish:focus { border-color: rgba(232,201,138,.42); background: rgba(255,246,230,.09); }
+  .light {
+    margin-top: 10px; width: 100%; height: 46px; border-radius: 12px; cursor: pointer;
+    border: 1px solid rgba(255,236,198,.4);
+    background: linear-gradient(180deg, #ffd79a 0%, #f0a95f 55%, #d07f3c 100%);
+    color: #3a1e0a; font-family: inherit; font-size: 15px; font-weight: 700;
+    letter-spacing: 6px; text-indent: 6px;
+    box-shadow: 0 14px 30px -16px rgba(255,180,110,.9), inset 0 1px 0 rgba(255,250,235,.55);
+    transition: filter .15s ease, transform .12s ease;
+  }
+  .light:hover { filter: brightness(1.06); }
+  .light:active { transform: translateY(1px); }
+  .light[disabled] { cursor: default; filter: saturate(.6) brightness(.8); }
+
+  .bless {
+    margin-top: 10px; min-height: 20px; text-align: center;
+    font-size: 12.5px; letter-spacing: 1.4px; color: rgba(255,220,170,.9);
+    opacity: 0; transform: translateY(4px); transition: opacity .5s ease, transform .5s ease;
+  }
+  .bless.on { opacity: 1; transform: none; }
+
+  .foot { margin-top: 14px; font-size: 10.5px; letter-spacing: 1.8px; color: rgba(248,239,224,.3); text-align: center; }
+  .foot b { color: rgba(255,206,138,.85); font-weight: 700; }
+
+  /* ---------- rising clone + placed stars ---------- */
+  .rising { position: fixed; z-index: 5; pointer-events: none; will-change: transform, opacity; }
+  .placed {
+    position: fixed; z-index: 1; pointer-events: none;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #ffe2ac;
+    box-shadow: 0 0 10px 3px rgba(255,196,120,.55), 0 0 26px 8px rgba(255,170,90,.22);
+    animation: twinkle 5s ease-in-out infinite;
+  }
+  .placed::after {
+    content: ''; position: absolute; inset: -9px; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255,205,140,.28), transparent 72%);
+  }
+
+  @media (max-height: 700px) {
+    .lantern-wrap { width: 108px; height: 154px; }
+    .title { font-size: 18px; }
+    .sub { margin-top: 6px; }
+    .center { gap: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<div class="stars" id="stars"></div>
+<div class="moon"></div>
+
+<main class="app">
+  <header class="head">
+    <div class="title">祈 福 灯</div>
+    <div class="sub" id="sub">写一句愿 · 点一盏灯</div>
+  </header>
+
+  <div class="center">
+    <div class="lantern-wrap" id="lanternWrap" title="点亮">
+      <div class="lantern" id="lantern">
+        <svg viewBox="0 0 132 188" aria-hidden="true">
+          <defs>
+            <radialGradient id="glow" cx="50%" cy="62%" r="50%">
+              <stop offset="0%" stop-color="#ffd79a" stop-opacity=".78"/>
+              <stop offset="45%" stop-color="#ffb066" stop-opacity=".38"/>
+              <stop offset="100%" stop-color="#ff8f4a" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="paper" cx="50%" cy="84%" r="80%">
+              <stop offset="0%" stop-color="#fff3d2"/>
+              <stop offset="42%" stop-color="#ffc47e"/>
+              <stop offset="100%" stop-color="#d97a42"/>
+            </radialGradient>
+            <linearGradient id="paperTop" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#fff0cf"/>
+              <stop offset="100%" stop-color="#f6ad68"/>
+            </linearGradient>
+          </defs>
+
+          <ellipse cx="66" cy="104" rx="62" ry="66" fill="url(#glow)"/>
+
+          <!-- body: narrow top, wide bottom — a proper sky lantern -->
+          <path d="M49 38 C 39 62 25 98 25 122 C 25 141 44 152 66 152 C 88 152 107 141 107 122 C 107 98 93 62 83 38 C 78 33 54 33 49 38 Z"
+                fill="url(#paper)" opacity=".97"/>
+          <!-- top rim -->
+          <ellipse cx="66" cy="36" rx="18" ry="5" fill="url(#paperTop)" opacity=".95"/>
+          <ellipse cx="66" cy="36" rx="18" ry="5" fill="none" stroke="rgba(255,245,220,.6)" stroke-width="1"/>
+          <!-- seams -->
+          <path d="M44 60 C 36 84 30 106 29 124" fill="none" stroke="rgba(140,70,25,.12)" stroke-width="1"/>
+          <path d="M88 60 C 96 84 102 106 103 124" fill="none" stroke="rgba(140,70,25,.12)" stroke-width="1"/>
+          <path d="M31 66 Q66 58 101 66" fill="none" stroke="rgba(140,70,25,.13)" stroke-width="1"/>
+          <path d="M28 112 Q66 104 104 112" fill="none" stroke="rgba(140,70,25,.1)" stroke-width="1"/>
+          <!-- 愿 -->
+          <text x="66" y="108" text-anchor="middle" font-size="33" fill="rgba(255,249,235,.78)"
+                font-family="Kaiti SC, KaiTi, STKaiti, serif">愿</text>
+          <!-- bottom opening -->
+          <ellipse cx="66" cy="150" rx="33" ry="7.5" fill="#8a4420" opacity=".8"/>
+          <ellipse cx="66" cy="149" rx="27" ry="6" fill="#3a1708" opacity=".92"/>
+          <!-- flame -->
+          <g class="flame">
+            <ellipse cx="66" cy="146" rx="13" ry="14" fill="#ffc06a" opacity=".5"/>
+            <path d="M66 132 C 72 141 73 147 66 152 C 59 147 60 141 66 132 Z" fill="#fff6d8"/>
+            <path d="M66 138 C 69 143 69 147 66 149 C 63 147 63 143 66 138 Z" fill="#ffd587"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="hint" id="hint">轻点灯身 或 写下愿望再点亮</div>
+  </div>
+
+  <section class="panel">
+    <textarea class="wish" id="wish" rows="1" maxlength="40" placeholder="写下你的愿望（可不填）…" spellcheck="false"></textarea>
+    <button class="light" id="light">点 亮</button>
+    <div class="bless" id="bless"></div>
+  </section>
+
+  <footer class="foot">今夜已放 <b id="count">0</b> 盏 · 愿灯火可亲</footer>
+</main>
+
+<script>
+(function () {
+  'use strict'
+
+  var KEY = 'toys.qifu.v1'
+  var MAX_STARS = 48
+
+  var BLESSINGS = [
+    '愿你所求，皆有回响',
+    '灯火可亲，来日可期',
+    '所行皆坦途，所遇皆善意',
+    '愿你被这世界温柔以待',
+    '心里有光，走到哪儿都不算夜路',
+    '山高路远，终有人等你回家',
+    '愿今夜好眠，明日有好消息',
+    '所念皆如愿，所愿皆成真',
+    '风会记得你的名字，灯也会',
+    '慢一点也没关系，你总会到的',
+  ]
+
+  var $ = function (id) { return document.getElementById(id) }
+  var wrap = $('lanternWrap')
+  var lantern = $('lantern')
+  var wish = $('wish')
+  var lightBtn = $('light')
+  var blessEl = $('bless')
+  var countEl = $('count')
+  var hintEl = $('hint')
+  var starsEl = $('stars')
+
+  var count = 0
+  var placed = []       // { x, y } in px, viewport coords
+  var busy = false
+  var audio = null
+
+  /* ---------- storage ---------- */
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY)
+      if (!raw) return
+      var d = JSON.parse(raw)
+      count = (d && typeof d.count === 'number') ? d.count : 0
+      if (d && Array.isArray(d.stars)) {
+        placed = d.stars.filter(function (s) { return s && typeof s.x === 'number' && typeof s.y === 'number' }).slice(-MAX_STARS)
+      }
+    } catch (e) {}
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify({ count: count, stars: placed.slice(-MAX_STARS) })) } catch (e) {}
+  }
+
+  /* ---------- sound ---------- */
+  function prime() {
+    try {
+      var C = window.AudioContext || window.webkitAudioContext
+      if (!C) return
+      if (!audio) audio = new C()
+      if (audio.state === 'suspended') audio.resume()
+    } catch (e) {}
+  }
+  function chime(base, vol) {
+    try {
+      if (!audio) return
+      var now = audio.currentTime
+      ;[1, 2.02, 2.98].forEach(function (mult, i) {
+        var osc = audio.createOscillator()
+        var g = audio.createGain()
+        osc.type = 'sine'
+        osc.frequency.value = base * mult
+        var v = vol / (i + 1.6)
+        g.gain.setValueAtTime(0.0001, now)
+        g.gain.exponentialRampToValueAtTime(v, now + 0.02)
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 2.4 + i * 0.3)
+        osc.connect(g); g.connect(audio.destination)
+        osc.start(now); osc.stop(now + 2.9)
+      })
+    } catch (e) {}
+  }
+
+  /* ---------- sky ---------- */
+  function buildStars() {
+    var frag = document.createDocumentFragment()
+    for (var i = 0; i < 90; i++) {
+      var s = document.createElement('i')
+      s.className = 'star'
+      var size = Math.random() * 1.8 + 0.7
+      s.style.cssText =
+        'left:' + (Math.random() * 100).toFixed(2) + '%;' +
+        'top:' + (Math.random() * 72).toFixed(2) + '%;' +
+        'width:' + size.toFixed(1) + 'px;height:' + size.toFixed(1) + 'px;' +
+        'animation-delay:' + (Math.random() * 4).toFixed(2) + 's;' +
+        'opacity:' + (0.2 + Math.random() * 0.5).toFixed(2)
+      frag.appendChild(s)
+    }
+    starsEl.appendChild(frag)
+  }
+
+  function addPlaced(x, y, animate) {
+    var d = document.createElement('div')
+    d.className = 'placed'
+    d.style.left = (x - 3.5) + 'px'
+    d.style.top = (y - 3.5) + 'px'
+    d.style.animationDelay = (Math.random() * 4).toFixed(2) + 's'
+    if (animate) {
+      d.animate(
+        [{ opacity: 0, transform: 'scale(.2)' }, { opacity: 1, transform: 'scale(1)' }],
+        { duration: 1400, easing: 'ease-out' }
+      )
+    }
+    document.body.appendChild(d)
+    placed.push({ x: x, y: y })
+    while (placed.length > MAX_STARS) {
+      placed.shift()
+      var first = document.querySelector('.placed')
+      if (first) first.remove()
+    }
+  }
+
+  function restorePlaced() {
+    placed.forEach(function (p) { addPlaced(p.x, p.y, false) })
+    // keep storage in sync with what actually rendered
+    placed = placed.slice(-MAX_STARS)
+  }
+
+  /* ---------- the act ---------- */
+  function release(ev) {
+    if (busy) return
+    busy = true
+    lightBtn.disabled = true
+    prime()
+
+    var text = (wish.value || '').trim().slice(0, 40)
+    var start = wrap.getBoundingClientRect()
+    var drift = (Math.random() * 2 - 1) * 70
+    var rise = start.top + start.height / 2 + 40
+
+    // clone the lantern so the original can reappear immediately
+    var ghost = lantern.cloneNode(true)
+    ghost.className = 'rising'
+    ghost.style.left = start.left + 'px'
+    ghost.style.top = start.top + 'px'
+    ghost.style.width = start.width + 'px'
+    ghost.style.height = start.height + 'px'
+    document.body.appendChild(ghost)
+    ghost.style.animation = 'none'
+    lantern.style.opacity = '0'
+    hintEl.style.opacity = '.25'
+
+    var anim = ghost.animate(
+      [
+        { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: 1, filter: 'brightness(1)' },
+        { transform: 'translate(' + (drift * 0.35) + 'px,' + (-rise * 0.45) + 'px) scale(.78) rotate(' + (drift > 0 ? 2 : -2) + 'deg)', opacity: 1, offset: 0.45 },
+        { transform: 'translate(' + drift + 'px,' + (-rise) + 'px) scale(.34) rotate(' + (drift > 0 ? -3 : 3) + 'deg)', opacity: .15, filter: 'brightness(1.25)' },
+      ],
+      { duration: 4600, easing: 'cubic-bezier(.35,0,.65,1)', fill: 'forwards' }
+    )
+
+    chime(523.25, 0.05)
+    setTimeout(function () { chime(783.99, 0.035) }, 380)
+
+    var cx = start.left + start.width / 2 + drift
+    var cy = start.top + start.height / 2 - rise
+
+    anim.finished.then(function () {
+      ghost.remove()
+      addPlaced(cx, cy, true)
+      count += 1
+      countEl.textContent = count
+      save()
+
+      var line = BLESSINGS[Math.floor(Math.random() * BLESSINGS.length)]
+      blessEl.textContent = text ? '「' + text + '」已托付给夜色 · ' + line : line
+      blessEl.classList.add('on')
+
+      busy = false
+      lightBtn.disabled = false
+      wish.value = ''
+      hintEl.style.opacity = '.25'
+      lantern.style.opacity = ''
+    }).catch(function () {
+      ghost.remove()
+      lantern.style.opacity = ''
+      busy = false
+      lightBtn.disabled = false
+    })
+  }
+
+  /* ---------- wiring ---------- */
+  wrap.addEventListener('click', release)
+  lightBtn.addEventListener('click', release)
+  wish.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); release() }
+  })
+
+  buildStars()
+  load()
+  restorePlaced()
+  countEl.textContent = count
+})()
+</script>
+</body>
+</html>
+
