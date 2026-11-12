@@ -87,6 +87,12 @@
     font-size: 20px; letter-spacing: 0; transform: rotate(-4deg);
   }
   .sum-main { font-size: 15px; letter-spacing: 2px; }
+  .summary .seal { animation: stamp .62s cubic-bezier(.2,1.25,.4,1) both; }
+  @keyframes stamp {
+    0% { opacity: 0; transform: scale(1.7) rotate(-16deg); }
+    62% { opacity: 1; transform: scale(.93) rotate(-2deg); }
+    100% { opacity: 1; transform: scale(1) rotate(-4deg); }
+  }
   .sum-sub { margin-top: 5px; font-size: 11.5px; letter-spacing: 1.2px; color: var(--ink-2); }
 
   .chart {
@@ -136,12 +142,68 @@
   .foot { margin-top: 22px; text-align: center; font-size: 10.5px; letter-spacing: 1.4px; color: rgba(92,70,54,.4); line-height: 1.9; }
 
   .toast {
-    position: fixed; left: 50%; bottom: 34px; transform: translate(-50%, 12px); z-index: 60;
+    position: fixed; left: 50%; bottom: 92px; transform: translate(-50%, 12px); z-index: 60;
     padding: 9px 16px; border-radius: 20px; background: rgba(40,22,14,.88); color: #f8efe0;
     font-size: 12.5px; letter-spacing: 1px; opacity: 0; pointer-events: none; transition: all .3s ease;
+    max-width: 86vw; line-height: 1.7; text-align: center; white-space: normal;
   }
   .toast.on { opacity: 1; transform: translate(-50%, 0); }
 
+  /* ---------- 愉悦层 ---------- */
+  .headline {
+    margin: 16px 4px 2px; font-size: 19px; line-height: 1.9; letter-spacing: 1px; color: #2a1a12;
+    animation: rise .55s cubic-bezier(.2,.8,.3,1) both;
+  }
+  .headline b { color: var(--red-2); font-weight: 700; }
+  .reveal > * { animation: rise .55s cubic-bezier(.2,.8,.3,1) both; }
+  .reveal > *:nth-child(1) { animation-delay: .04s }
+  .reveal > *:nth-child(2) { animation-delay: .10s }
+  .reveal > *:nth-child(3) { animation-delay: .16s }
+  .reveal > *:nth-child(4) { animation-delay: .22s }
+  .reveal > *:nth-child(5) { animation-delay: .28s }
+  .reveal > *:nth-child(6) { animation-delay: .34s }
+  .reveal > *:nth-child(7) { animation-delay: .40s }
+  .reveal > *:nth-child(8) { animation-delay: .46s }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+
+  .sec {
+    margin-top: 12px; padding: 16px 18px 14px;
+    background: rgba(255,252,244,.82); border: 1px solid var(--line); border-radius: 14px;
+  }
+  .sec h3 { margin: 0 0 10px; font-size: 11.5px; letter-spacing: 4px; color: var(--red-2); font-weight: 700; }
+  .sec p { margin: 0 0 9px; font-size: 13.5px; line-height: 1.95; color: #35251c; }
+  .sec p:last-child { margin-bottom: 0; }
+  .sec b { color: var(--red-2); }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .pill {
+    padding: 5px 12px; border-radius: 999px; font-size: 11.5px; letter-spacing: 1px;
+    color: #7a3a2a; background: rgba(178,58,42,.06); border: 1px solid rgba(178,58,42,.18);
+  }
+  details.tech { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,252,244,.6); }
+  details.tech summary { padding: 12px 16px; cursor: pointer; font-size: 11.5px; letter-spacing: 3px; color: var(--ink-2); outline: none; }
+  details.tech .inner { padding: 0 16px 14px; font-size: 12px; line-height: 2; color: #4a382c; }
+
+  .ov {
+    position: fixed; inset: 0; z-index: 80; display: none; align-items: center; justify-content: center;
+    flex-direction: column; gap: 20px; background: rgba(247,239,221,.94);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  }
+  .ov.on { display: flex; }
+  .ring { position: relative; width: 62px; height: 62px; border-radius: 50%; border: 1px solid rgba(178,58,42,.22); border-top-color: var(--red); animation: spin 1.05s linear infinite; }
+  .ring::after { content: ''; position: absolute; inset: 11px; border-radius: 50%; border: 1px solid rgba(178,58,42,.16); border-bottom-color: var(--red); animation: spin 1.7s linear infinite reverse; }
+  @keyframes spin { to { transform: rotate(360deg) } }
+  .ov-text { font-size: 12.5px; letter-spacing: 5px; color: var(--red-2); }
+  .ov-sub { font-size: 10.5px; letter-spacing: 2px; color: rgba(92,70,54,.5); }
+
+  .acts { display: flex; gap: 10px; margin-top: 16px; }
+  .acts .go { margin: 0; flex: 1; }
+  .acts .ghost {
+    flex: 0 0 132px; height: 48px; border-radius: 10px; cursor: pointer; font-family: inherit;
+    font-size: 13px; letter-spacing: 2px; color: var(--red-2);
+    background: rgba(255,252,244,.7); border: 1px solid rgba(178,58,42,.3);
+  }
+  .acts .ghost:hover { background: rgba(255,252,244,.95); }
   @media (max-width: 420px) {
     .gz { font-size: 22px; }
     .ln-row { grid-template-columns: repeat(4, 1fr); }
@@ -205,6 +267,12 @@
     四柱由节气与干支历法推算，非随机文案；<br>
     命理为传统文化，权当参考，不作决断。
   </div>
+</div>
+
+<div class="ov" id="ov">
+  <div class="ring"></div>
+  <div class="ov-text" id="ovText">起 盘 中</div>
+  <div class="ov-sub">依节气立四柱 · 五行十神 · 大运流年</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -490,9 +558,162 @@
       '</div>'
   }
 
+  var GAN_IMG = {
+    甲: '一棵往上长的树', 乙: '藤蔓与花草', 丙: '正午的太阳', 丁: '一盏灯',
+    戊: '城墙与山', 己: '田里的土', 庚: '刀剑', 辛: '珠玉', 壬: '江河', 癸: '雨露',
+  }
+  var GAN_LONG = {
+    甲: '你是甲木，一棵往上长的树。阳光、土壤、空间，缺一样都长不好；但只要还站着，就一直在长。',
+    乙: '你是乙木，藤蔓与花草。不争高，会借力；别人以为你软，其实你最能活。',
+    丙: '你是丙火，正午的太阳。亮、热、藏不住事，走到哪儿都先把场子点着。',
+    丁: '你是丁火，一盏灯。不刺眼，但长情，照的是身边三尺。',
+    戊: '你是戊土，城墙与山。能扛事，别人靠得住；只是扛久了，会忘记自己也需要人扶。',
+    己: '你是己土，田里的土。养东西的命，心细，会照顾人，也容易被别人的情绪牵着走。',
+    庚: '你是庚金，刀剑。果断、讲义气；出鞘伤人，收鞘伤己。',
+    辛: '你是辛金，珠玉。爱惜羽毛，讲究，敏感；被擦一擦就发亮，被磕一下就记很久。',
+    壬: '你是壬水，江河。见得多，想得远，爱自由；只是水要有河道，不然就散成一片。',
+    癸: '你是癸水，雨露。细腻，共情，心里戏多；落下来润物无声，落不下就憋成云。',
+  }
+  var STRENGTH_SHORT = { 身强: '底子厚，力气有余', 身弱: '根不算足，宜借力', 中和: '气比较匀，走自己的节奏' }
+  var STRENGTH_LONG = {
+    身强: '你的底子厚，力气有余。这种人不怕做事，怕的是没处使——把力气花出去，人就顺了。',
+    身弱: '你的根不算足。这不是坏事，是你更适合借力：读书、靠平台、跟对的人，比一个人硬扛管用得多。',
+    中和: '你的气比较匀。不用刻意补什么，按自己的节奏走，反而比谁都快。',
+  }
+  var SS_TRAIT2 = {
+    比肩: '你不太爱求人，什么都想自己扛——这是底气，也是孤独的来源。',
+    劫财: '你敢冲敢抢，重义气；只是替人花钱的时候，容易忘了自己也要过日子。',
+    食神: '你会享受，嘴上有福，做事有耐心。做手艺、做吃食、做让人舒服的事，天生占便宜。',
+    伤官: '你才气外露，不服管，说话直。作品比人缘好，这不是坏事，是要找对地方。',
+    偏财: '你路子活，敢下注，机会常自己找上门。守不住的时候，多半是心太散。',
+    正财: '你踏实会过日子，钱来得慢，但守得住。这种命不怕晚，怕的是被人催。',
+    七杀: '你扛压，硬气，越逼越强。年轻时少吃几次冲动的亏，后半程就很稳。',
+    正官: '你讲规矩，要面子，适合在有秩序的地方做事。别为了别人的评价把自己拧得太紧。',
+    偏印: '你想得多，学得杂，喜欢自己琢磨。容易晚睡，也容易把自己绕进去——想完记得去做。',
+    正印: '你心软，爱读书，长辈缘好。求稳是优点，但别稳到不敢动。',
+  }
+  var DY_USE = {
+    比肩: '这十年靠自己。朋友多，气也足，但容易各走各路——把话说清楚，比什么都重要。',
+    劫财: '这十年热闹，机会和消耗一起来。合伙写清楚，钱留一手。',
+    食神: '这十年适合往外拿：写、做、教、卖，越输出越顺。',
+    伤官: '这十年锋芒在外，作品比人缘好。找个认本事的地方，别在讲资历的地方耗。',
+    偏财: '这十年跟钱有关，机会多，也考定力。别把运气当本事。',
+    正财: '这十年适合攒：钱、手艺、信用。慢一点，但都是自己的。',
+    七杀: '这十年压力大，也是立住的时候。硬扛不如会扛。',
+    正官: '这十年在秩序里长。规矩会磨人，也会给你台阶。',
+    偏印: '这十年适合学、想、琢磨。别只想不做，做一件是一件。',
+    正印: '这十年适合蓄：读书、养身、跟长辈。不必急着证明什么。',
+  }
+  var WX_AFF = {
+    木: ['青绿', '东方', '清晨'], 火: ['赤红', '南方', '正午'], 土: ['米黄', '中部', '午后'],
+    金: ['素白', '西方', '傍晚'], 水: ['藏蓝', '北方', '夜里'],
+  }
+  var CLOSINGS = [
+    '命盘只是底牌，怎么打是你的事。',
+    '不必赢过谁。把日子过得像自己，就已经很好。',
+    '你不需要成为谁。走到哪儿算哪儿，也算一种本事。',
+    '日子长着呢。今天觉得过不去的，明年就是一句话的事。',
+    '该吃的苦吃，该要的东西去要。命理只管一半，另一半在你手里。',
+    '别急着给自己下定义。你是一棵树也好，一盏灯也好，长成什么样，还得看后面几十年。',
+  ]
+
+  function nayinOfPillar(p) {
+    var idx = -1
+    for (var i = 0; i < 60; i++) if (i % 10 === p.gan && i % 12 === p.zhi) { idx = i; break }
+    if (idx < 0) return ''
+    return NAYIN[Math.floor(idx / 2)]
+  }
+
+  function buildReading(c) {
+    var g = GAN[c.dayGan]
+    var head = '你是<b>' + GAN_IMG[g] + '</b>——' + STRENGTH_SHORT[c.strength] + '。'
+
+    var sorted = WX.slice().sort(function (a, b) { return c.wxScore[a] - c.wxScore[b] })
+    var least = sorted[0]
+    var miss = WX.filter(function (k) { return c.wxScore[k] < 0.35 })
+
+    var counts = {}
+    c.shishen.forEach(function (s, i) { if (i !== 2 && s) counts[s] = (counts[s] || 0) + 1 })
+    var ranked = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a] })
+
+    var secs = []
+
+    // 底子
+    var p1 = '<p>' + GAN_LONG[g] + '</p>'
+    p1 += '<p>生在' + ZHI[c.pillars[1].zhi] + '月，' + STRENGTH_LONG[c.strength] + '</p>'
+    if (miss.length) {
+      p1 += '<p>五行走下来，<b>' + miss.join('、') + '</b>偏薄——' + miss.map(function (k) { return WX_TIP[k] }).join('；') + '。这一处补一补，气就顺了。</p>'
+    } else if (least !== c.me) {
+      p1 += '<p>五行不缺，最薄的是<b>' + least + '</b>——' + WX_TIP[least] + '。随手可补的一处。</p>'
+    } else {
+      p1 += '<p>五行不缺，气也匀。少见的局面，不必刻意补什么。</p>'
+    }
+    var aff = WX_AFF[least] || WX_AFF[c.me]
+    p1 += '<div class="pills">' +
+      '<span class="pill">色 · ' + aff[0] + '</span>' +
+      '<span class="pill">方 · ' + aff[1] + '</span>' +
+      '<span class="pill">时 · ' + aff[2] + '</span>' +
+      '</div>'
+    secs.push({ t: '你 的 底 子', h: p1 })
+
+    // 性子
+    var p2 = ''
+    if (ranked[0]) p2 += '<p>' + SS_TRAIT2[ranked[0]] + '</p>'
+    if (ranked[1]) p2 += '<p>另一面是 <b>' + ranked[1] + '</b>：' + SS_TRAIT2[ranked[1]] + '</p>'
+    if (!p2) p2 = '<p>十神分布很平均，没有哪一面特别抢戏。这在命理里叫「无格」，其实是最难被定义的一种人。</p>'
+    p2 += '<p style="color:#6b5340;font-size:11.5px">四柱十神：' + c.shishen.map(function (s, i) { return i === 2 ? '日主' : s }).join(' · ') + '</p>'
+    secs.push({ t: '你 的 性 子', h: p2 })
+
+    // 运程
+    var dy = c.dayun[c.dyNow]
+    var p3 = '<p>' + (c.forward ? '大运顺行' : '大运逆行') + '，约 ' + Math.floor(c.startYear) + ' 岁' +
+      (c.startMonth ? c.startMonth + ' 个月' : '') + ' 起运，每十年一换。眼下走在 <b>' +
+      GAN[dy.gan] + ZHI[dy.zhi] + '</b> 这步（' + dy.age + ' 岁起，' + dy.ss + '）。</p>'
+    p3 += '<p>' + (DY_USE[dy.ss] || '') + '</p>'
+    secs.push({ t: '你 的 运 程', h: p3 })
+
+    // 给你的话
+    var close = CLOSINGS[c.dayIdx % CLOSINGS.length]
+    secs.push({ t: '给 你 的 话', h: '<p>' + close + '</p>' })
+
+    return { headline: head, sections: secs }
+  }
+
+  function chartText(c) {
+    var z = ZODIAC[((c.solarYear - 4) % 12 + 12) % 12]
+    var L = [
+      '八字：' + c.pillars.map(function (p) { return GAN[p.gan] + ZHI[p.zhi] }).join(' '),
+      '日主：' + GAN[c.dayGan] + c.me + ' · ' + c.strength + ' · 生肖' + z,
+      '五行：' + WX.map(function (k) { return k + c.wxScore[k].toFixed(1) }).join('  '),
+      '大运：' + c.dayun.map(function (d) { return GAN[d.gan] + ZHI[d.zhi] }).join(' '),
+      '——',
+      '排自 antidotewxy.github.io/toys/paipan',
+    ]
+    return L.join('\n')
+  }
+
+  function ritual(done) {
+    var ov = $('ov')
+    if (!ov) { done(); return }
+    var txt = $('ovText')
+    var words = ['起 盘 中', '排 四 柱', '分 五 行', '起 大 运']
+    var i = 0
+    ov.classList.add('on')
+    txt.textContent = words[0]
+    var timer = setInterval(function () {
+      i = (i + 1) % words.length
+      txt.textContent = words[i]
+    }, 240)
+    setTimeout(function () {
+      clearInterval(timer)
+      ov.classList.remove('on')
+      done()
+    }, 980)
+  }
+
   function render(c) {
     var maxWx = Math.max.apply(null, WX.map(function (k) { return c.wxScore[k] }))
-    var missing = WX.filter(function (k) { return c.wxScore[k] < 0.35 })
+    var r = buildReading(c)
 
     var cols = c.pillars.map(function (p, i) {
       return '<div class="col">' +
@@ -505,7 +726,7 @@
     }).join('')
 
     var dayunHtml = c.dayun.map(function (d, i) {
-      return '<div class="dy' + (i === c.dyNow ? ' now' : '') + '">' +
+      return '<div class="dy' + (i === c.dyNow ? ' now' : '') + '" title="' + (DY_USE[d.ss] || '') + '">' +
         '<div class="dy-age">' + d.age + '岁</div>' +
         '<div class="dy-gz">' + GAN[d.gan] + ZHI[d.zhi] + '</div>' +
         '<div class="dy-ss">' + d.ss + '</div>' +
@@ -522,6 +743,10 @@
 
     var bazi = c.pillars.map(function (p) { return GAN[p.gan] + ZHI[p.zhi] }).join(' ')
 
+    var secs = r.sections.map(function (s) {
+      return '<div class="sec"><h3>' + s.t + '</h3>' + s.h + '</div>'
+    }).join('')
+
     var html =
       '<div class="summary">' +
         '<div class="seal">命</div>' +
@@ -532,48 +757,53 @@
         '</div>' +
       '</div>' +
 
-      '<div class="chart">' + cols + '</div>' +
+      '<div class="headline">' + r.headline + '</div>' +
 
-      '<div class="block">' +
-        '<div class="b-title">五 行 强 弱</div>' +
-        '<div class="bars">' + WX.map(function (k) { return bar(k, c.wxScore[k], maxWx) }).join('') + '</div>' +
-        '<div style="margin-top:12px;font-size:12.5px;line-height:1.9;color:#3a271d">' +
-          '日主 <b>' + GAN[c.dayGan] + c.me + '</b>，' + c.strength +
-          '（支持 ' + c.ratio.toFixed(2) + '）。' +
-          (missing.length ? '命中偏缺 <b>' + missing.join('、') + '</b>。' : '五行俱全，气比较匀。') +
+      '<div class="reveal">' +
+        '<div class="chart">' + cols + '</div>' +
+
+        '<div class="block">' +
+          '<div class="b-title">五 行 强 弱</div>' +
+          '<div class="bars">' + WX.map(function (k) { return bar(k, c.wxScore[k], maxWx) }).join('') + '</div>' +
         '</div>' +
-      '</div>' +
 
-      '<div class="block read">' + reading(c) + '</div>' +
+        secs +
 
-      '<div class="block">' +
-        '<div class="b-title">大 运</div>' +
-        '<div style="font-size:11.5px;color:#6b5340;margin-bottom:10px">' +
-          (c.forward ? '顺行' : '逆行') + ' · ' + Math.floor(c.startYear) + '岁' +
-          (c.startMonth ? c.startMonth + '个月' : '') + '起运 · 每十年一换' +
+        '<div class="block">' +
+          '<div class="b-title">大 运</div>' +
+          '<div style="font-size:11.5px;color:#6b5340;margin-bottom:10px">' +
+            (c.forward ? '顺行' : '逆行') + ' · ' + Math.floor(c.startYear) + '岁' +
+            (c.startMonth ? c.startMonth + '个月' : '') + '起运 · 点一下每步，看一句话' +
+          '</div>' +
+          '<div class="scroll"><div class="dy-row">' + dayunHtml + '</div></div>' +
+          '<div class="scroll-hint">← 左右滑动看十步大运 →</div>' +
         '</div>' +
-        '<div class="scroll"><div class="dy-row">' + dayunHtml + '</div></div>' +
-        '<div class="scroll-hint">← 左右滑动看十步大运 →</div>' +
-      '</div>' +
 
-      '<div class="block">' +
-        '<div class="b-title">流 年（未来十年）</div>' +
-        '<div class="ln-row">' + liunianHtml + '</div>' +
-      '</div>' +
-
-      '<div class="block">' +
-        '<div class="b-title">其 他</div>' +
-        '<div style="font-size:12.5px;line-height:2;color:#3a271d">' +
-          '空亡：' + c.kong.join('、') + '<br>' +
-          '胎元：' + c.taiyuan + '<br>' +
-          '纳音：' + c.pillars.map(function (p, i) { return p.name + ' ' + nayinOfPillar(p) }).join(' · ') +
+        '<div class="block">' +
+          '<div class="b-title">流 年（未来十年）</div>' +
+          '<div class="ln-row">' + liunianHtml + '</div>' +
         '</div>' +
-      '</div>' +
-      '<button class="go" id="again" type="button" style="margin-top:16px">再 排 一 个</button>'
+
+        '<details class="tech">' +
+          '<summary>技 术 细 节</summary>' +
+          '<div class="inner">' +
+            '空亡：' + c.kong.join('、') + '<br>' +
+            '胎元：' + c.taiyuan + '<br>' +
+            '纳音：' + c.pillars.map(function (p) { return p.name + ' ' + nayinOfPillar(p) }).join(' · ') + '<br>' +
+            '日主支持度：' + c.ratio.toFixed(2) + '（0.44 以下偏弱，0.56 以上偏旺）' +
+          '</div>' +
+        '</details>' +
+
+        '<div class="acts">' +
+          '<button class="go" id="again" type="button">再 排 一 个</button>' +
+          '<button class="ghost" id="copy" type="button">抄下命盘</button>' +
+        '</div>' +
+      '</div>'
 
     var box = $('result')
     box.innerHTML = html
     box.classList.add('on')
+
     var againBtn = $('again')
     if (againBtn) {
       againBtn.addEventListener('click', function () {
@@ -582,90 +812,38 @@
         setTimeout(function () { $('birth').focus() }, 400)
       })
     }
+    var copyBtn = $('copy')
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function () {
+        var text = chartText(c)
+        var done = function () { toast('命盘已抄好，可以发给朋友') }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text); done() })
+        } else { fallbackCopy(text); done() }
+      })
+    }
+    var dyRow = box.querySelector('.dy-row')
+    if (dyRow) {
+      dyRow.addEventListener('click', function (e) {
+        var el = e.target.closest('.dy')
+        if (!el) return
+        var idx = [].indexOf.call(dyRow.children, el)
+        var d = c.dayun[idx]
+        if (d) toast(GAN[d.gan] + ZHI[d.zhi] + ' · ' + d.ss + '：' + (DY_USE[d.ss] || ''))
+      })
+    }
     box.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
-  function nayinOfPillar(p) {
-    var idx = -1
-    for (var i = 0; i < 60; i++) if (i % 10 === p.gan && i % 12 === p.zhi) { idx = i; break }
-    if (idx < 0) return ''
-    return NAYIN[Math.floor(idx / 2)]
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea')
+    ta.value = text
+    ta.style.cssText = 'position:fixed;left:-9999px'
+    document.body.appendChild(ta)
+    ta.select()
+    try { document.execCommand('copy') } catch (e) {}
+    ta.remove()
   }
-
-  /* ---------- 白话批语 ---------- */
-  var GAN_CHAR = {
-    甲: '参天之木，向上、讲原则，不太会拐弯',
-    乙: '花草藤萝，柔而能缠，最会找缝生长',
-    丙: '太阳之火，热、直、爱照人，也容易灼人',
-    丁: '灯烛之火，细、暖、长情，静静照着',
-    戊: '城墙之土，稳、厚、能扛事，也容易固执',
-    己: '田园之土，能养物，心细，会照顾人',
-    庚: '刀剑之金，果断、讲义气，脾性刚',
-    辛: '珠玉之金，爱惜羽毛，敏感，讲究',
-    壬: '江河之水，见识广，爱自由，收不住',
-    癸: '雨露之水，细腻、共情，心里戏多',
-  }
-  var SS_TRAIT = {
-    比肩: '自我主张强，不太爱求人，朋友多但真正交心的少',
-    劫财: '敢冲敢抢，重义气，但也容易替人花钱',
-    食神: '会享受，嘴上有福，做事有耐心，适合手艺与吃喝',
-    伤官: '才气外露，不服管，说话直，作品比人缘好',
-    偏财: '路子活，敢下注，机会常自己找上门',
-    正财: '踏实会过日子，钱来得慢但守得住',
-    七杀: '扛压，硬气，越逼越强，年轻时要少吃冲动的亏',
-    正官: '讲规矩，要面子，适合在体系里做事',
-    偏印: '想得多，学得杂，喜欢自己琢磨，容易晚睡',
-    正印: '心软，爱读书，长辈缘好，做事求稳',
-  }
-
-  function reading(c) {
-    var out = []
-    var dg = GAN[c.dayGan]
-    out.push('<p><b>性情。</b>' + GAN_CHAR[dg] + '。生在' + ZHI[c.pillars[1].zhi] + '月，' +
-      c.strength + '之局——' + (c.strength === '身强'
-        ? '底子够，宜往外走，多做事、多担责，把力气花出去才顺。'
-        : c.strength === '身弱'
-          ? '根不太足，宜先借力：读书、靠平台、跟对人，比单打独斗走得远。'
-          : '气比较匀，不必刻意补或泄，按自己的节奏走就好。') + '</p>')
-
-    // 十神分布
-    var counts = {}
-    c.shishen.forEach(function (s, i) { if (i !== 2 && s) counts[s] = (counts[s] || 0) + 1 })
-    var top = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a] })[0]
-    if (top) {
-      out.push('<p><b>格局。</b>天干以<b>' + top + '</b>最显。' + (SS_TRAIT[top] || '') + '。<br>' +
-        '四柱十神：' + c.shishen.map(function (s, i) {
-          return (i === 2 ? '日主' : s)
-        }).join(' / ') + '。</p>')
-    }
-
-    // 五行
-    var weak = WX.filter(function (k) { return c.wxScore[k] < 0.8 })
-    var strong = WX.filter(function (k) { return c.wxScore[k] === Math.max.apply(null, WX.map(function (x) { return c.wxScore[x] })) })
-    if (weak.length) {
-      out.push('<p><b>五行的偏。</b>' + weak.map(function (k) {
-        return k + '弱'
-      }).join('、') + '：' + weak.map(function (k) {
-        return WX_TIP[k]
-      }).join('；') + '。' +
-        (strong.length ? strong[0] + '偏旺，旺的那一面容易过——' + WX_WARN[strong[0]] + '。' : '') + '</p>')
-    } else {
-      out.push('<p><b>五行的偏。</b>五行不缺，' + (c.strength === '身弱'
-        ? '但日主偏弱——不是缺什么，是根不够。宜借力：多读书、找平台、跟对的人，别一个人硬扛。'
-        : c.strength === '身强'
-          ? '且日主偏旺——力气有余，宜往外用：多做事、多输出、多担责，闷着反而堵。'
-          : '气脉周流，属于少见的匀整之局，不必刻意去补什么。') + '</p>')
-    }
-
-    // 起运
-    out.push('<p><b>运程。</b>' + (c.forward ? '阳男阴女，大运顺行' : '阴男阳女，大运逆行') +
-      '，约 <b>' + Math.floor(c.startYear) + ' 岁' + (c.startMonth ? c.startMonth + ' 个月' : '') + '</b> 起运。' +
-      '眼下这步大运是 <b>' + GAN[c.dayun[c.dyNow].gan] + ZHI[c.dayun[c.dyNow].zhi] + '</b>（' + c.dayun[c.dyNow].ss + '），' +
-      SS_TRAIT[c.dayun[c.dyNow].ss] + '。看大运不必求吉凶，只看哪一段该往外冲、哪一段该收着做。</p>')
-
-    return out.join('')
-  }
-
   var WX_TIP = {
     木: '多亲近草木与清晨，青色、东方对你顺',
     火: '多晒太阳、多说话，赤色、南方对你顺',
@@ -695,7 +873,7 @@
 
     var c = computeChart(parts[0], parts[1], parts[2], parseInt(tm[0], 10), parseInt(tm[1] || '0', 10), tz)
     lastChart = c
-    render(c)
+    ritual(function () { render(c) })
   })
 
   $('demo').addEventListener('click', function () {
@@ -709,6 +887,10 @@
 </script>
 </body>
 </html>
+
+
+
+
 
 
 
