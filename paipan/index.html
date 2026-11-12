@@ -1,0 +1,711 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#efe6d4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>八字排盘 · 命书</title>
+<style>
+  :root {
+    --ink: #241a14;
+    --ink-2: #5c4636;
+    --red: #b23a2a;
+    --red-2: #8d2a1d;
+    --paper: #f7efdd;
+    --line: rgba(120,90,50,.22);
+    --font: "Kaiti SC", "KaiTi", "STKaiti", "楷体", "Songti SC", "Noto Serif SC", serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: var(--font); color: var(--ink); min-height: 100%;
+    background:
+      radial-gradient(120% 60% at 50% 0%, #fdf8ec 0%, #f3e9d5 55%, #e7d9bd 100%);
+    -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; opacity: .45; z-index: 0;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(120,90,50,.045) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgba(120,90,50,.035) 0 1px, transparent 1px 4px);
+  }
+  .wrap { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 26px 18px 48px; }
+
+  header { text-align: center; margin-bottom: 18px; }
+  .h-title { font-size: 22px; letter-spacing: 8px; text-indent: 8px; color: var(--red-2); font-weight: 700; }
+  .h-sub { margin-top: 7px; font-size: 11.5px; letter-spacing: 2.2px; color: rgba(92,70,54,.6); }
+
+  .card {
+    background: rgba(255,252,244,.78); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px; box-shadow: 0 18px 40px -30px rgba(60,30,10,.7);
+  }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .field { flex: 1 1 150px; min-width: 130px; }
+  .field label { display: block; font-size: 11px; letter-spacing: 1.6px; color: var(--ink-2); margin-bottom: 6px; }
+  input[type=date], input[type=time], select {
+    width: 100%; height: 42px; padding: 0 10px; border-radius: 9px; font-family: inherit; font-size: 13.5px;
+    color: var(--ink); background: #fffdf7; border: 1px solid rgba(140,100,60,.3); outline: none;
+  }
+  input:focus, select:focus { border-color: rgba(178,58,42,.5); }
+  .seg { display: flex; gap: 0; border: 1px solid rgba(140,100,60,.3); border-radius: 9px; overflow: hidden; height: 42px; }
+  .seg button {
+    flex: 1; border: none; background: #fffdf7; font-family: inherit; font-size: 13.5px; color: var(--ink-2);
+    cursor: pointer; letter-spacing: 2px;
+  }
+  .seg button + button { border-left: 1px solid rgba(140,100,60,.22); }
+  .seg button.on { background: linear-gradient(180deg, #c2452f, #8d2517); color: #fff4e2; }
+
+  details { margin-top: 12px; }
+  summary { cursor: pointer; font-size: 11.5px; letter-spacing: 1.6px; color: var(--ink-2); outline: none; }
+  .adv { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+
+  .go {
+    margin-top: 14px; width: 100%; height: 48px; border-radius: 10px; cursor: pointer;
+    border: 1px solid #7e2417; color: #fff4e2;
+    background: linear-gradient(180deg, #c2452f 0%, #a83324 55%, #8d2517 100%);
+    font-family: inherit; font-size: 16px; font-weight: 700; letter-spacing: 8px; text-indent: 8px;
+    box-shadow: 0 14px 28px -18px rgba(141,37,23,.9), inset 0 1px 0 rgba(255,230,200,.35);
+  }
+  .go:active { transform: translateY(1px); }
+  .demo { display: block; margin: 10px auto 0; background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 11.5px; letter-spacing: 1px; color: rgba(92,70,54,.65); text-decoration: underline; }
+
+  /* ---------- 命盘 ---------- */
+  #result { margin-top: 20px; display: none; }
+  #result.on { display: block; animation: fade .4s ease both; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+
+  .summary {
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px; margin-bottom: 12px;
+    background: rgba(255,252,244,.8); border: 1px solid var(--line); border-radius: 14px;
+  }
+  .seal {
+    width: 52px; height: 52px; flex: 0 0 auto; display: grid; place-items: center;
+    border: 2px solid var(--red); border-radius: 6px; color: var(--red);
+    font-size: 20px; letter-spacing: 0; transform: rotate(-4deg);
+  }
+  .sum-main { font-size: 15px; letter-spacing: 2px; }
+  .sum-sub { margin-top: 5px; font-size: 11.5px; letter-spacing: 1.2px; color: var(--ink-2); }
+
+  .chart {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+    background: rgba(255,252,244,.8); border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+  }
+  .col { border-left: 1px solid rgba(120,90,50,.14); text-align: center; padding: 12px 6px 14px; }
+  .col:first-child { border-left: none; }
+  .col-head { font-size: 10.5px; letter-spacing: 2px; color: rgba(92,70,54,.6); margin-bottom: 8px; }
+  .ss { font-size: 10.5px; color: rgba(92,70,54,.75); height: 16px; letter-spacing: .5px; }
+  .gz { font-size: 26px; line-height: 1.25; letter-spacing: 1px; }
+  .gz .wx { font-size: 10px; color: rgba(92,70,54,.5); display: block; letter-spacing: .5px; }
+  .hide { margin-top: 6px; font-size: 10.5px; color: rgba(92,70,54,.62); line-height: 1.6; }
+  .nayin { margin-top: 4px; font-size: 10px; color: rgba(92,70,54,.45); }
+
+  .block { margin-top: 12px; background: rgba(255,252,244,.8); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+  .b-title { font-size: 12px; letter-spacing: 3px; color: var(--red-2); margin-bottom: 12px; }
+  .bars { display: flex; flex-direction: column; gap: 9px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .bar-name { width: 24px; color: var(--ink-2); letter-spacing: 1px; }
+  .bar-track { flex: 1; height: 8px; background: rgba(120,90,50,.12); border-radius: 4px; overflow: hidden; }
+  .bar-fill { display: block; height: 100%; border-radius: 4px; transition: width .6s cubic-bezier(.2,.8,.3,1); }
+  .bar-val { width: 34px; text-align: right; color: var(--ink-2); font-size: 11px; }
+
+  .read p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.95; color: #35251c; }
+  .read p:last-child { margin-bottom: 0; }
+  .read b { color: var(--red-2); }
+
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -4px; padding: 0 4px; }
+  .dy-row { display: flex; gap: 8px; min-width: max-content; }
+  .dy {
+    width: 66px; padding: 9px 4px; border-radius: 9px; text-align: center;
+    background: rgba(255,255,255,.55); border: 1px solid rgba(140,100,60,.22);
+  }
+  .dy.now { border-color: rgba(178,58,42,.6); background: rgba(178,58,42,.07); }
+  .dy-age { font-size: 10px; color: rgba(92,70,54,.6); }
+  .dy-gz { font-size: 17px; margin: 3px 0 2px; }
+  .dy-ss { font-size: 10px; color: rgba(92,70,54,.55); }
+
+  .ln-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .ln { padding: 8px 4px; border-radius: 9px; text-align: center; background: rgba(255,255,255,.5); border: 1px solid rgba(140,100,60,.18); }
+  .ln-y { font-size: 10px; color: rgba(92,70,54,.6); }
+  .ln-gz { font-size: 15px; margin: 2px 0; }
+  .ln-ss { font-size: 9.5px; color: rgba(92,70,54,.55); }
+
+  .scroll-hint { margin-top: 8px; text-align: center; font-size: 10px; letter-spacing: 1.4px; color: rgba(92,70,54,.38); }
+  .foot { margin-top: 22px; text-align: center; font-size: 10.5px; letter-spacing: 1.4px; color: rgba(92,70,54,.4); line-height: 1.9; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 34px; transform: translate(-50%, 12px); z-index: 60;
+    padding: 9px 16px; border-radius: 20px; background: rgba(40,22,14,.88); color: #f8efe0;
+    font-size: 12.5px; letter-spacing: 1px; opacity: 0; pointer-events: none; transition: all .3s ease;
+  }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 420px) {
+    .gz { font-size: 22px; }
+    .ln-row { grid-template-columns: repeat(4, 1fr); }
+    .sum-main { font-size: 13.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="h-title">八 字 排 盘</div>
+    <div class="h-sub">依节气立四柱 · 五行十神 · 大运流年</div>
+  </header>
+
+  <form class="card" id="form">
+    <div class="row">
+      <div class="field">
+        <label>出生日期（公历）</label>
+        <input type="date" id="birth" required>
+      </div>
+      <div class="field">
+        <label>出生时间</label>
+        <input type="time" id="time" value="12:00" required>
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div class="field">
+        <label>性别</label>
+        <div class="seg" id="gender">
+          <button type="button" data-g="m" class="on">男</button>
+          <button type="button" data-g="f">女</button>
+        </div>
+      </div>
+      <div class="field" style="flex:1 1 120px">
+        <label>&nbsp;</label>
+        <button class="go" type="submit" style="margin:0">排 盘</button>
+      </div>
+    </div>
+    <details>
+      <summary>高级：出生地时区（默认北京时间）</summary>
+      <div class="adv">
+        <div class="field" style="flex:1 1 100%">
+          <select id="tz">
+            <option value="8" selected>东八区 · 北京 / 上海 / 广州（UTC+8）</option>
+            <option value="7">东七区 · 曼谷 / 雅加达（UTC+7）</option>
+            <option value="9">东九区 · 东京 / 首尔（UTC+9）</option>
+            <option value="10">东十区 · 悉尼（UTC+10）</option>
+            <option value="0">零时区 · 伦敦（UTC+0）</option>
+            <option value="-5">西五区 · 纽约（UTC-5）</option>
+            <option value="-8">西八区 · 洛杉矶（UTC-8）</option>
+          </select>
+        </div>
+      </div>
+    </details>
+    <button class="demo" type="button" id="demo">用一组示例看看 →</button>
+  </form>
+
+  <section id="result"></section>
+
+  <div class="foot">
+    四柱由节气与干支历法推算，非随机文案；<br>
+    命理为传统文化，权当参考，不作决断。
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict'
+
+  /* ===================================================================
+     基础常量
+     =================================================================== */
+  var GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸']
+  var ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥']
+  var GAN_WX = ['木','木','火','火','土','土','金','金','水','水']
+  var ZHI_WX = ['水','土','木','木','土','火','火','土','金','金','土','水']
+  var GAN_YY = [1,0,1,0,1,0,1,0,1,0]      // 1 阳 0 阴
+  var ZHI_YY = [1,0,1,0,1,0,1,0,1,0,1,0]
+  var ZODIAC = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪']
+  var WX = ['木','火','土','金','水']
+  var WX_COLOR = { 木: '#4a7c59', 火: '#b23a2a', 土: '#a8823f', 金: '#8a8578', 水: '#3f6b8c' }
+  var SHENG = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' }
+  var KE = { 木: '土', 土: '水', 水: '火', 火: '金', 金: '木' }
+  var HIDDEN = {
+    子: ['癸'], 丑: ['己','癸','辛'], 寅: ['甲','丙','戊'], 卯: ['乙'],
+    辰: ['戊','乙','癸'], 巳: ['丙','庚','戊'], 午: ['丁','己'], 未: ['己','丁','乙'],
+    申: ['庚','壬','戊'], 酉: ['辛'], 戌: ['戊','辛','丁'], 亥: ['壬','甲'],
+  }
+  var NAYIN = ['海中金','炉中火','大林木','路旁土','剑锋金','山头火','涧下水','城头土','白蜡金','杨柳木',
+    '泉中水','屋上土','霹雳火','松柏木','长流水','沙中金','山下火','平地木','壁上土','金箔金',
+    '覆灯火','天河水','大驿土','钗钏金','桑柘木','大溪水','沙中土','天上火','石榴木','大海水']
+
+  var SHISHEN_OF = function (dayGan, otherGan) {
+    var a = GAN_WX[dayGan], b = GAN_WX[otherGan]
+    var same = GAN_YY[dayGan] === GAN_YY[otherGan]
+    if (a === b) return same ? '比肩' : '劫财'
+    if (SHENG[a] === b) return same ? '食神' : '伤官'
+    if (KE[a] === b) return same ? '偏财' : '正财'
+    if (KE[b] === a) return same ? '七杀' : '正官'
+    if (SHENG[b] === a) return same ? '偏印' : '正印'
+    return ''
+  }
+
+  /* ===================================================================
+     历法：儒略日 / 太阳黄经 / 节气
+     =================================================================== */
+  function jdFromUT(y, m, d, hours) {
+    if (m <= 2) { y -= 1; m += 12 }
+    var A = Math.floor(y / 100)
+    var B = 2 - A + Math.floor(A / 4)
+    return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + B - 1524.5 + (hours || 0) / 24
+  }
+
+  function norm360(x) { x = x % 360; return x < 0 ? x + 360 : x }
+
+  /** 太阳视黄经（度），Meeus 低精度，误差约 0.01° */
+  function sunLongitude(jd) {
+    var T = (jd - 2451545.0) / 36525
+    var L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T
+    var M = (357.52911 + 35999.05029 * T - 0.0001537 * T * T) * Math.PI / 180
+    var C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M)
+          + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
+          + 0.000289 * Math.sin(3 * M)
+    var omega = (125.04 - 1934.136 * T) * Math.PI / 180
+    return norm360(L0 + C - 0.00569 - 0.00478 * Math.sin(omega))
+  }
+
+  function angleDiff(a, b) {
+    var d = norm360(a - b)
+    if (d > 180) d -= 360
+    return d
+  }
+
+  /** 求某年太阳黄经达到 target 度的时刻（UT 儒略日） */
+  function solarTermJD(year, target, guessMonth, guessDay) {
+    var lo = jdFromUT(year, guessMonth, guessDay, 0) - 24
+    var hi = jdFromUT(year, guessMonth, guessDay, 0) + 24
+    for (var i = 0; i < 60; i++) {
+      var mid = (lo + hi) / 2
+      if (angleDiff(sunLongitude(mid), target) < 0) lo = mid; else hi = mid
+    }
+    return (lo + hi) / 2
+  }
+
+  /** 十二「节」：立春 315° 起，每 30° 一个 */
+  var JIE = [
+    { deg: 315, name: '立春', m: 2, d: 4 },
+    { deg: 345, name: '惊蛰', m: 3, d: 6 },
+    { deg: 15,  name: '清明', m: 4, d: 5 },
+    { deg: 45,  name: '立夏', m: 5, d: 6 },
+    { deg: 75,  name: '芒种', m: 6, d: 6 },
+    { deg: 105, name: '小暑', m: 7, d: 7 },
+    { deg: 135, name: '立秋', m: 8, d: 8 },
+    { deg: 165, name: '白露', m: 9, d: 8 },
+    { deg: 195, name: '寒露', m: 10, d: 8 },
+    { deg: 225, name: '立冬', m: 11, d: 7 },
+    { deg: 255, name: '大雪', m: 12, d: 7 },
+    { deg: 285, name: '小寒', m: 1, d: 6 },
+  ]
+
+  var termCache = {}
+  function jieList(year) {
+    if (termCache[year]) return termCache[year]
+    var list = JIE.map(function (j) {
+      return { deg: j.deg, name: j.name, jd: solarTermJD(year, j.deg, j.m, j.d), year: year }
+    })
+    termCache[year] = list
+    return list
+  }
+
+  /* ===================================================================
+     四柱
+     =================================================================== */
+  function computeChart(y, m, d, hh, mm, tz) {
+    var birthUT = jdFromUT(y, m, d, hh + mm / 60) - tz / 24
+
+    // ---- 年柱：以立春为界
+    var lichun = solarTermJD(y, 315, 2, 4)
+    var solarYear = birthUT < lichun ? y - 1 : y
+    var yearIdx = ((solarYear - 4) % 60 + 60) % 60
+
+    // ---- 月柱：以「节」为界
+    var terms = jieList(y - 1).concat(jieList(y), jieList(y + 1))
+    terms.sort(function (a, b) { return a.jd - b.jd })
+    var lastJie = null, nextJie = null
+    for (var i = 0; i < terms.length; i++) {
+      if (terms[i].jd <= birthUT) lastJie = terms[i]
+      else { nextJie = terms[i]; break }
+    }
+    var monthNo = (JIE.findIndex(function (x) { return x.name === lastJie.name }) + 1) // 1=寅月
+    var monthZhi = (monthNo + 1) % 12
+    var yearGanForMonth = yearIdx % 10
+    var monthGan = ((yearGanForMonth % 5) * 2 + 2 + (monthNo - 1)) % 10
+
+    // ---- 日柱：23:00 后算子时次日
+    var dayShift = hh >= 23 ? 1 : 0
+    var jdn = Math.floor(jdFromUT(y, m, d, 12)) + dayShift
+    var DAY_OFFSET = ((54 - Math.floor(jdFromUT(2000, 1, 1, 12))) % 60 + 60) % 60
+    var dayIdx = ((jdn + DAY_OFFSET) % 60 + 60) % 60
+
+    // ---- 时柱
+    var hourZhi = Math.floor(((hh + 1) % 24) / 2)
+    var dayGan = dayIdx % 10
+    var hourGan = ((dayGan % 5) * 2 + hourZhi) % 10
+
+    var pillars = [
+      { name: '年柱', gan: yearIdx % 10, zhi: yearIdx % 12 },
+      { name: '月柱', gan: monthGan, zhi: monthZhi },
+      { name: '日柱', gan: dayGan, zhi: dayIdx % 12 },
+      { name: '时柱', gan: hourGan, zhi: hourZhi },
+    ]
+
+    /* ---------- 五行强弱 ---------- */
+    var wxScore = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 }
+    pillars.forEach(function (p, idx) {
+      wxScore[GAN_WX[p.gan]] += 1
+      var hid = HIDDEN[ZHI[p.zhi]]
+      var w = idx === 1 ? 1.6 : 1
+      hid.forEach(function (g, k) {
+        var weight = k === 0 ? 1 : (k === 1 ? 0.4 : 0.2)
+        wxScore[GAN_WX[GAN.indexOf(g)]] += weight * w
+      })
+    })
+
+    var me = GAN_WX[dayGan]
+    var support = wxScore[me] + wxScore[inverse(SHENG, me)]   // 比劫 + 印
+    var total = WX.reduce(function (s, k) { return s + wxScore[k] }, 0)
+    var ratio = total ? support / total : 0.5
+    var strength = ratio > 0.56 ? '身强' : ratio < 0.44 ? '身弱' : '中和'
+
+    /* ---------- 十神 ---------- */
+    var shishen = pillars.map(function (p, idx) {
+      if (idx === 2) return '日主'
+      return SHISHEN_OF(dayGan, p.gan)
+    })
+
+    /* ---------- 藏干 ---------- */
+    var hidden = pillars.map(function (p) { return HIDDEN[ZHI[p.zhi]] })
+
+    /* ---------- 纳音 ---------- */
+    function nayinOf(idx) {
+      var pair = Math.floor((((idx % 60) + 60) % 60) / 2)
+      return NAYIN[pair % 30]
+    }
+
+    /* ---------- 空亡 ---------- */
+    var xunStart = dayIdx - (dayIdx % 10)
+    var kong = [ZHI[(xunStart + 10) % 12], ZHI[(xunStart + 11) % 12]]
+
+    /* ---------- 胎元 ---------- */
+    var taiGan = (monthGan + 1) % 10
+    var taiZhi = (monthZhi + 3) % 12
+
+    /* ---------- 大运 ---------- */
+    var yangYear = GAN_YY[yearIdx % 10] === 1
+    var forward = (yangYear && tzSafeGender === 'm') || (!yangYear && tzSafeGender === 'f')
+    var refJie = forward ? nextJie : lastJie
+    var days = Math.abs(refJie.jd - birthUT)
+    var startAge = days / 3
+    var startYear = Math.floor(startAge)
+    var startMonth = Math.floor((startAge - startYear) * 12)
+    var monthPillarIdx = ((function () {
+      // 月柱在六十甲子中的序号
+      for (var i = 0; i < 60; i++) if (i % 10 === monthGan && i % 12 === monthZhi) return i
+      return 0
+    })())
+
+    var dayun = []
+    for (var k = 1; k <= 10; k++) {
+      var idx = ((monthPillarIdx + (forward ? k : -k)) % 60 + 60) % 60
+      dayun.push({
+        age: startYear + (k - 1) * 10,
+        gan: idx % 10, zhi: idx % 12,
+        ss: SHISHEN_OF(dayGan, idx % 10),
+      })
+    }
+
+    /* ---------- 流年（未来十年） ---------- */
+    var nowYear = new Date().getFullYear()
+    var liunian = []
+    for (var n = 0; n < 10; n++) {
+      var yy = nowYear + n
+      var yi = ((yy - 4) % 60 + 60) % 60
+      liunian.push({ year: yy, gan: yi % 10, zhi: yi % 12, ss: SHISHEN_OF(dayGan, yi % 10) })
+    }
+
+    return {
+      solarYear: solarYear,
+      pillars: pillars, shishen: shishen, hidden: hidden,
+
+      wxScore: wxScore, strength: strength, ratio: ratio,
+      me: me, support: support, total: total,
+      kong: kong, taiyuan: GAN[taiGan] + ZHI[taiZhi],
+      dayun: dayun, liunian: liunian,
+      startYear: startYear, startMonth: startMonth, forward: forward,
+      dyNow: Math.min(9, Math.max(0, Math.floor((new Date().getFullYear() - y - startYear) / 10))),
+      dayGan: dayGan, dayIdx: dayIdx, monthPillarIdx: monthPillarIdx,
+      yearGanZhi: GAN[yearIdx % 10] + ZHI[yearIdx % 12],
+      birth: { y: y, m: m, d: d, hh: hh, mm: mm, tz: tz },
+    }
+
+    function hourPillarIdx() {
+      for (var i = 0; i < 60; i++) if (i % 10 === hourGan && i % 12 === hourZhi) return i
+      return 0
+    }
+  }
+
+  function inverse(map, val) {
+    for (var k in map) if (map[k] === val) return k
+    return val
+  }
+
+  /* ===================================================================
+     渲染
+     =================================================================== */
+  var gender = 'm'
+  var tzSafeGender = 'm'
+  var lastChart = null
+
+  var $ = function (id) { return document.getElementById(id) }
+
+  function toast(msg) {
+    var t = $('toast')
+    t.textContent = msg
+    t.classList.add('on')
+    clearTimeout(t._h)
+    t._h = setTimeout(function () { t.classList.remove('on') }, 1800)
+  }
+
+  document.getElementById('gender').addEventListener('click', function (e) {
+    var b = e.target.closest('button')
+    if (!b) return
+    ;[].forEach.call(this.children, function (c) { c.classList.toggle('on', c === b) })
+    gender = b.dataset.g
+    tzSafeGender = gender
+  })
+
+  function bar(name, val, max) {
+    var pct = max ? Math.round(val / max * 100) : 0
+    return '<div class="bar-row">' +
+      '<span class="bar-name">' + name + '</span>' +
+      '<span class="bar-track"><span class="bar-fill" style="width:' + pct + '%;background:' + WX_COLOR[name] + '"></span></span>' +
+      '<span class="bar-val">' + val.toFixed(1) + '</span>' +
+      '</div>'
+  }
+
+  function render(c) {
+    var maxWx = Math.max.apply(null, WX.map(function (k) { return c.wxScore[k] }))
+    var missing = WX.filter(function (k) { return c.wxScore[k] < 0.35 })
+
+    var cols = c.pillars.map(function (p, i) {
+      return '<div class="col">' +
+        '<div class="col-head">' + p.name + '</div>' +
+        '<div class="ss">' + c.shishen[i] + '</div>' +
+        '<div class="gz">' + GAN[p.gan] + '<span class="wx">' + GAN_WX[p.gan] + '</span></div>' +
+        '<div class="gz">' + ZHI[p.zhi] + '<span class="wx">' + ZHI_WX[p.zhi] + '</span></div>' +
+        '<div class="hide">藏 ' + c.hidden[i].join(' ') + '</div>' +
+        '</div>'
+    }).join('')
+
+    var dayunHtml = c.dayun.map(function (d, i) {
+      return '<div class="dy' + (i === c.dyNow ? ' now' : '') + '">' +
+        '<div class="dy-age">' + d.age + '岁</div>' +
+        '<div class="dy-gz">' + GAN[d.gan] + ZHI[d.zhi] + '</div>' +
+        '<div class="dy-ss">' + d.ss + '</div>' +
+        '</div>'
+    }).join('')
+
+    var liunianHtml = c.liunian.map(function (l) {
+      return '<div class="ln">' +
+        '<div class="ln-y">' + l.year + '</div>' +
+        '<div class="ln-gz">' + GAN[l.gan] + ZHI[l.zhi] + '</div>' +
+        '<div class="ln-ss">' + l.ss + '</div>' +
+        '</div>'
+    }).join('')
+
+    var bazi = c.pillars.map(function (p) { return GAN[p.gan] + ZHI[p.zhi] }).join(' ')
+
+    var html =
+      '<div class="summary">' +
+        '<div class="seal">命</div>' +
+        '<div>' +
+          '<div class="sum-main">' + bazi + '</div>' +
+          '<div class="sum-sub">' + c.solarYear + '年 · 日主 ' + GAN[c.dayGan] + c.me + ' · ' + c.strength +
+          ' · 生肖' + ZODIAC[((c.solarYear - 4) % 12 + 12) % 12] + '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="chart">' + cols + '</div>' +
+
+      '<div class="block">' +
+        '<div class="b-title">五 行 强 弱</div>' +
+        '<div class="bars">' + WX.map(function (k) { return bar(k, c.wxScore[k], maxWx) }).join('') + '</div>' +
+        '<div style="margin-top:12px;font-size:12.5px;line-height:1.9;color:#3a271d">' +
+          '日主 <b>' + GAN[c.dayGan] + c.me + '</b>，' + c.strength +
+          '（支持 ' + c.ratio.toFixed(2) + '）。' +
+          (missing.length ? '命中偏缺 <b>' + missing.join('、') + '</b>。' : '五行俱全，气比较匀。') +
+        '</div>' +
+      '</div>' +
+
+      '<div class="block read">' + reading(c) + '</div>' +
+
+      '<div class="block">' +
+        '<div class="b-title">大 运</div>' +
+        '<div style="font-size:11.5px;color:#6b5340;margin-bottom:10px">' +
+          (c.forward ? '顺行' : '逆行') + ' · ' + Math.floor(c.startYear) + '岁' +
+          (c.startMonth ? c.startMonth + '个月' : '') + '起运 · 每十年一换' +
+        '</div>' +
+        '<div class="scroll"><div class="dy-row">' + dayunHtml + '</div></div>' +
+        '<div class="scroll-hint">← 左右滑动看十步大运 →</div>' +
+      '</div>' +
+
+      '<div class="block">' +
+        '<div class="b-title">流 年（未来十年）</div>' +
+        '<div class="ln-row">' + liunianHtml + '</div>' +
+      '</div>' +
+
+      '<div class="block">' +
+        '<div class="b-title">其 他</div>' +
+        '<div style="font-size:12.5px;line-height:2;color:#3a271d">' +
+          '空亡：' + c.kong.join('、') + '<br>' +
+          '胎元：' + c.taiyuan + '<br>' +
+          '纳音：' + c.pillars.map(function (p, i) { return p.name + ' ' + nayinOfPillar(p) }).join(' · ') +
+        '</div>' +
+      '</div>' +
+      '<button class="go" id="again" type="button" style="margin-top:16px">再 排 一 个</button>'
+
+    var box = $('result')
+    box.innerHTML = html
+    box.classList.add('on')
+    var againBtn = $('again')
+    if (againBtn) {
+      againBtn.addEventListener('click', function () {
+        box.classList.remove('on')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        setTimeout(function () { $('birth').focus() }, 400)
+      })
+    }
+    box.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  function nayinOfPillar(p) {
+    var idx = -1
+    for (var i = 0; i < 60; i++) if (i % 10 === p.gan && i % 12 === p.zhi) { idx = i; break }
+    if (idx < 0) return ''
+    return NAYIN[Math.floor(idx / 2)]
+  }
+
+  /* ---------- 白话批语 ---------- */
+  var GAN_CHAR = {
+    甲: '参天之木，向上、讲原则，不太会拐弯',
+    乙: '花草藤萝，柔而能缠，最会找缝生长',
+    丙: '太阳之火，热、直、爱照人，也容易灼人',
+    丁: '灯烛之火，细、暖、长情，静静照着',
+    戊: '城墙之土，稳、厚、能扛事，也容易固执',
+    己: '田园之土，能养物，心细，会照顾人',
+    庚: '刀剑之金，果断、讲义气，脾性刚',
+    辛: '珠玉之金，爱惜羽毛，敏感，讲究',
+    壬: '江河之水，见识广，爱自由，收不住',
+    癸: '雨露之水，细腻、共情，心里戏多',
+  }
+  var SS_TRAIT = {
+    比肩: '自我主张强，不太爱求人，朋友多但真正交心的少',
+    劫财: '敢冲敢抢，重义气，但也容易替人花钱',
+    食神: '会享受，嘴上有福，做事有耐心，适合手艺与吃喝',
+    伤官: '才气外露，不服管，说话直，作品比人缘好',
+    偏财: '路子活，敢下注，机会常自己找上门',
+    正财: '踏实会过日子，钱来得慢但守得住',
+    七杀: '扛压，硬气，越逼越强，年轻时要少吃冲动的亏',
+    正官: '讲规矩，要面子，适合在体系里做事',
+    偏印: '想得多，学得杂，喜欢自己琢磨，容易晚睡',
+    正印: '心软，爱读书，长辈缘好，做事求稳',
+  }
+
+  function reading(c) {
+    var out = []
+    var dg = GAN[c.dayGan]
+    out.push('<p><b>性情。</b>' + GAN_CHAR[dg] + '。生在' + ZHI[c.pillars[1].zhi] + '月，' +
+      c.strength + '之局——' + (c.strength === '身强'
+        ? '底子够，宜往外走，多做事、多担责，把力气花出去才顺。'
+        : c.strength === '身弱'
+          ? '根不太足，宜先借力：读书、靠平台、跟对人，比单打独斗走得远。'
+          : '气比较匀，不必刻意补或泄，按自己的节奏走就好。') + '</p>')
+
+    // 十神分布
+    var counts = {}
+    c.shishen.forEach(function (s, i) { if (i !== 2 && s) counts[s] = (counts[s] || 0) + 1 })
+    var top = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a] })[0]
+    if (top) {
+      out.push('<p><b>格局。</b>天干以<b>' + top + '</b>最显。' + (SS_TRAIT[top] || '') + '。<br>' +
+        '四柱十神：' + c.shishen.map(function (s, i) {
+          return (i === 2 ? '日主' : s)
+        }).join(' / ') + '。</p>')
+    }
+
+    // 五行
+    var weak = WX.filter(function (k) { return c.wxScore[k] < 0.8 })
+    var strong = WX.filter(function (k) { return c.wxScore[k] === Math.max.apply(null, WX.map(function (x) { return c.wxScore[x] })) })
+    if (weak.length) {
+      out.push('<p><b>五行的偏。</b>' + weak.map(function (k) {
+        return k + '弱'
+      }).join('、') + '：' + weak.map(function (k) {
+        return WX_TIP[k]
+      }).join('；') + '。' +
+        (strong.length ? strong[0] + '偏旺，旺的那一面容易过——' + WX_WARN[strong[0]] + '。' : '') + '</p>')
+    } else {
+      out.push('<p><b>五行的偏。</b>五行不缺，气脉周流，属于少见的匀整之局，不必刻意去补什么。</p>')
+    }
+
+    // 起运
+    out.push('<p><b>运程。</b>' + (c.forward ? '阳男阴女，大运顺行' : '阴男阳女，大运逆行') +
+      '，约 <b>' + Math.floor(c.startYear) + ' 岁' + (c.startMonth ? c.startMonth + ' 个月' : '') + '</b> 起运。' +
+      '眼下这步大运是 <b>' + GAN[c.dayun[c.dyNow].gan] + ZHI[c.dayun[c.dyNow].zhi] + '</b>（' + c.dayun[c.dyNow].ss + '），' +
+      SS_TRAIT[c.dayun[c.dyNow].ss] + '。看大运不必求吉凶，只看哪一段该往外冲、哪一段该收着做。</p>')
+
+    return out.join('')
+  }
+
+  var WX_TIP = {
+    木: '多亲近草木与清晨，青色、东方对你顺',
+    火: '多晒太阳、多说话，赤色、南方对你顺',
+    土: '把作息稳住，黄色、中部对你顺',
+    金: '把手里的事做精，白色、西方对你顺',
+    水: '多走动、多听多看，黑蓝、北方对你顺',
+  }
+  var WX_WARN = {
+    木: '主意太多，容易半途换道',
+    火: '性子急，话先于想',
+    土: '想得太多，行动太慢',
+    金: '太较真，容易伤和气',
+    水: '心太散，抓不住重点',
+  }
+
+  /* ===================================================================
+     交互
+     =================================================================== */
+  $('form').addEventListener('submit', function (e) {
+    e.preventDefault()
+    var bd = $('birth').value
+    if (!bd) { toast('先填一个出生日期'); return }
+    var tm = ($('time').value || '12:00').split(':')
+    var tz = parseFloat($('tz').value || '8')
+    var parts = bd.split('-').map(Number)
+    tzSafeGender = gender
+
+    var c = computeChart(parts[0], parts[1], parts[2], parseInt(tm[0], 10), parseInt(tm[1] || '0', 10), tz)
+    lastChart = c
+    render(c)
+  })
+
+  $('demo').addEventListener('click', function () {
+    $('birth').value = '1995-06-15'
+    $('time').value = '09:30'
+    ;[].forEach.call($('gender').children, function (c) { c.classList.toggle('on', c.dataset.g === 'm') })
+    gender = 'm'
+    $('form').dispatchEvent(new Event('submit', { cancelable: true }))
+  })
+})()
+</script>
+</body>
+</html>
+
+
+
+
